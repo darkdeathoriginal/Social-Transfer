@@ -11,9 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@adiwajshing/baileys": "git+https://github.com/souravkl11/Baileys.git",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@neoxr/neoxr-js": "^1.5.3",
+    "@whiskeysockets/baileys": "^6.2.1",
     "input": "^1.0.1",
     "pino": "^8.14.1",
     "pm2": "^5.3.0",

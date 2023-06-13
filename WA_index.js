@@ -1,4 +1,4 @@
-const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('@adiwajshing/baileys')
+const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('@whiskeysockets/baileys')
 global.component = new (require('@neoxr/neoxr-js'))
 const { Extra} = component
 const { Socket } = Extra
