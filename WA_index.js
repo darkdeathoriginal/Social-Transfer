@@ -23,6 +23,10 @@ class AddCmd {
         client: client,
       };
       newMessage.jid = m.key.remoteJid
+      newMessage.data = m
+      newMessage.forwardMessage = async(jid,data,context={})=>{
+         return await client.sendMessage(jid,{forward:data},context)
+      }
       
   
       if (this.pattern === "message") {
@@ -154,6 +158,7 @@ const store = makeInMemoryStore({
      client.ev.on('messages.upsert', async chatUpdate => {
         try {
            m = chatUpdate.messages[0]
+
            if (!m.message) return
            for (const module of modules) {
             await module.handleEvent(m, client);
