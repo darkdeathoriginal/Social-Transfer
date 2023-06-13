@@ -1,0 +1,25 @@
+{
+  "name": "social-transfer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "pm2 start WA_index.js --attach"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@adiwajshing/baileys": "git+https://github.com/souravkl11/Baileys.git",
+    "@adiwajshing/keyed-db": "^0.2.4",
+    "@neoxr/neoxr-js": "^1.5.3",
+    "input": "^1.0.1",
+    "pino": "^8.14.1",
+    "pm2": "^5.3.0",
+    "qrcode-terminal": "^0.12.0",
+    "sequelize": "^6.32.0",
+    "sqlite3": "^5.1.6",
+    "telegram": "^2.17.4"
+  }
+}
