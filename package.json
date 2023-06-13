@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@adiwajshing/baileys": "npm:baileys@6.0.8",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@neoxr/neoxr-js": "^1.5.3",
     "@whiskeysockets/baileys": "^6.2.1",
