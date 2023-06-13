@@ -150,7 +150,7 @@ const store = makeInMemoryStore({
               await props.save()
               process.exit(0)
            } else {
-              connect().catch(() => connect())
+              connect().catch((e) => console.log(e))
            }
         }
      })
@@ -170,6 +170,6 @@ const store = makeInMemoryStore({
 
  }
 
- connect().catch(() => connect())
+ connect().catch((e) => console.log(e))
  
   
