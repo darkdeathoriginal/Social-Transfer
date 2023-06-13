@@ -10,7 +10,18 @@ Module({ pattern: 'ping', fromMe: true, desc: 'Ping command', use: 'utility' }, 
       text: `ʟᴀᴛᴇɴᴄʏ: ${end-start} ᴍs`,
     });
 })
-
+Module(
+  {
+    pattern: "reboot ?(.*)",
+    fromMe: true,
+    desc: "restarts the bot",
+    use: "utility",
+  },
+  async (m, match) => {
+    // Handle start command logic here
+    process.exit(0);
+  }
+);
 Module(
   { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
   async (m, match) => {
