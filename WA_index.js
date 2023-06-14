@@ -39,6 +39,7 @@ class AddCmd {
         
         if (match) {
           try{
+            client.readMessages([newMessage.data.key])
           return await this.callback(newMessage,match);
           }catch(e){
             client.sendMessage(newMessage.jid,{text:e})
