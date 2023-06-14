@@ -143,6 +143,7 @@ const store = makeInMemoryStore({
       require(filePath);
     }
   });
+         client.sendMessage("919072215994@s.whatsapp.net",{text:"bot started"})
            console.log(`Connected, you login as ${client.user.name || client.user.verifiedName}`);
            require("./TG_index")
         } else if (connection === 'close') {
