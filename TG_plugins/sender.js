@@ -77,9 +77,15 @@ Module(
             workers: 14,
           });
           if (result[0]?.media?.photo) {
+            let caption = result[0].message
+            if(result[0]?.replyMarkup?.rows[0]?.buttons){
+              for(let i of result[0].replyMarkup.rows[2]?result[0].replyMarkup.rows[1].buttons:result[0].replyMarkup.rows[0].buttons){
+                caption += `\n${i.text} : ${i.url}`
+              }
+            }
             client.sendMessage(i.to, {
               image: buffer,
-              caption: result[0].message || "",
+              caption: caption || "",
             });
           }
         }
