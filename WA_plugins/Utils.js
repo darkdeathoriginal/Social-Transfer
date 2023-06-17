@@ -8,8 +8,8 @@ Module({ pattern: 'getjids', fromMe: true, desc: 'To get Group jids', use: 'util
     for (let e of groups){
         try {
     let g_name = (await m.client.groupMetadata(e)).subject
+    msg+= `_Group:_ ${g_name} \n_JID:_ ${e}\n\n`
     } catch {let g_name = 'Can\'t load name (rate-overlimit)'}
-    msg+= `_Group: ${g_name} \n_JID:_ ${e}\n\n`
     }
     await m.client.sendMessage(m.jid,{text:msg})
 })
