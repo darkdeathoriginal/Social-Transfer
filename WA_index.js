@@ -16,14 +16,48 @@ class AddCmd {
     }
   
     async handleEvent(m, client) {
-      const text = m.message?.conversation.toLowerCase() ||""
-  
-      let newMessage = {
-        ...m,
-        client: client,
-      };
+      const text = m.message?.conversation ||m.message.extendedTextMessage.text
+      if (m.message) {
+         if (m.message.viewOnceMessage) {
+            m.mtype = Object.keys(m.message.viewOnceMessage.message)[0]
+            m.msg = m.message.viewOnceMessage.message[m.mtype]
+         } else if (m.message.viewOnceMessageV2) {
+            m.mtype = Object.keys(m.message.viewOnceMessageV2.message)[0]
+            m.msg = m.message.viewOnceMessageV2.message[m.mtype]
+         } else {
+            m.mtype = Object.keys(m.message)[0] == 'senderKeyDistributionMessage' ? Object.keys(m.message)[2] == 'messageContextInfo' ? Object.keys(m.message)[1] : Object.keys(m.message)[2] : Object.keys(m.message)[0] != 'messageContextInfo' ? Object.keys(m.message)[0] : Object.keys(m.message)[1]
+            m.msg = m.message[m.mtype]
+         }
+      }
+      let newMessage = {}
       newMessage.jid = m.key.remoteJid
+      newMessage.message =  m.message?.conversation||m.message.extendedTextMessage.text
       newMessage.data = m
+      newMessage.quoted = m.msg.contextInfo ? m.msg.contextInfo.quotedMessage : null 
+      if (newMessage.quoted) {
+         let type = Object.keys(newMessage.quoted)[0]
+         newMessage.quoted = newMessage.quoted[type]
+         if (['productMessage'].includes(type)) {
+            type = Object.keys(newMessage.quoted)[0]
+            newMessage.quoted = newMessage.quoted[type]
+         }
+         if (['documentWithCaptionMessage'].includes(type)) {
+           type = Object.keys(newMessage.quoted)[0]
+           newMessage.quoted = newMessage.quoted.message[type]
+         }
+         if (typeof newMessage.quoted === 'string') newMessage.quoted = {
+            text: newMessage.quoted
+         }
+         newMessage.quoted.id = m.msg.contextInfo.stanzaId
+         newMessage.quoted.chat = m.msg.contextInfo.remoteJid || m.chat
+         newMessage.quoted.sender = m.msg.contextInfo.participant.split(":")[0] || m.msg.contextInfo.participant
+         newMessage.quoted.fromMe = newMessage.quoted.sender === (client.user && client.user.id)
+         newMessage.quoted.mentionedJid = m.msg.contextInfo ? m.msg.contextInfo.mentionedJid : []
+         newMessage.quoted.download = () => client.downloadMediaMessage(newMessage.quoted)
+      }
+   
+      newMessage.message = m.message?.conversation||m.message.extendedTextMessage.text
+      newMessage.client = client
       newMessage.forwardMessage = async(jid,data,context={})=>{
          return await client.sendMessage(jid,{forward:data},context)
       }
@@ -32,7 +66,7 @@ class AddCmd {
       if (this.pattern === "message") {
         return await this.callback(newMessage);
       } else {
-        const regex = new RegExp(`^\\.${this.pattern}`);
+        const regex = new RegExp(`^\\.${this.pattern}`,'i');
         if (typeof(text) === 'string') {
             const match = text.match(regex);
 
