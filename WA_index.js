@@ -57,7 +57,6 @@ class AddCmd {
          newMessage.quoted.download = () => client.downloadMediaMessage(newMessage.quoted)
       }
    
-      newMessage.message = m.message?.conversation||m.message.extendedTextMessage.text
       newMessage.client = client
       newMessage.forwardMessage = async(jid,data,context={})=>{
          return await client.sendMessage(jid,{forward:data},context)
