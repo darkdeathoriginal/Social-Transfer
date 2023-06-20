@@ -5,6 +5,7 @@ const { Socket } = Extra
 const fs = require('fs');
 const pino = require('pino')
 const modules = [];
+const util = require("util");
 
 class AddCmd {
     constructor({ pattern, fromMe, desc, use }, callback) {
@@ -61,6 +62,9 @@ class AddCmd {
       newMessage.forwardMessage = async(jid,data,context={})=>{
          return await client.sendMessage(jid,{forward:data},context)
       }
+      newMessage.send = async(text)=>{
+         return await client.sendMessage(newMessage.jid,{text:text})
+      }
       
   
       if (this.pattern === "message") {
@@ -76,7 +80,7 @@ class AddCmd {
             client.readMessages([newMessage.data.key])
           return await this.callback(newMessage,match);
           }catch(e){
-            client.sendMessage(newMessage.jid,{text:e})
+            client.sendMessage(newMessage.jid,{text:util.format(e)})
           }
         }}
       }
