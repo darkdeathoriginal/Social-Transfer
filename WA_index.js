@@ -58,7 +58,7 @@ class AddCmd {
       }
    
       newMessage.client = client
-      newMessage.forwardMessage = async(jid,data,context={})=>{
+      newMessage.forwardMessage = async(jid,data,context)=>{
          return await client.sendMessage(jid,{forward:data},context)
       }
       newMessage.send = async(text)=>{
