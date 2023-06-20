@@ -17,7 +17,7 @@ class AddCmd {
     }
   
     async handleEvent(m, client) {
-      const text = m.message?.conversation ||m.message.extendedTextMessage.text
+      const text = m.message?.conversation ||m.message?.extendedTextMessage?.text ||false
       if (m.message) {
          if (m.message.viewOnceMessage) {
             m.mtype = Object.keys(m.message.viewOnceMessage.message)[0]
