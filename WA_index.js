@@ -32,7 +32,7 @@ class AddCmd {
       }
       let newMessage = {}
       newMessage.jid = m.key.remoteJid
-      newMessage.message =  m.message?.conversation||m.message.extendedTextMessage.text
+      newMessage.message =  m.message?.conversation||m.message?.extendedTextMessage?.text || false
       newMessage.data = m
       newMessage.quoted = m.msg.contextInfo ? m.msg.contextInfo.quotedMessage : null 
       if (newMessage.quoted) {
