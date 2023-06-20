@@ -25,7 +25,7 @@ Module(
 Module(
   { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
   async (m, match) => {
-    let text = m.message?.conversation;
+    let text = m.message;
     if (text&&text.startsWith(">")) {
       const util = require("util");
       try {
