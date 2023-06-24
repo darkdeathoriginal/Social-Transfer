@@ -83,10 +83,10 @@ Module(
                 caption += `\n${i.text} : ${i.url}`
               }
             }
-            caption.replace(/#[^\s]+(?=(?:\s|$))/g,"").replaceAll("\n\n\n","\n")
+            
             client.sendMessage(i.to, {
               image: buffer,
-              caption: caption,
+              caption: caption.replace(/#[^\s]+(?=(?:\s|$))/g,"").replaceAll("\n\n\n","\n"),
             });
           }
           else{
@@ -96,10 +96,10 @@ Module(
                 caption += `\n${i.text} : ${i.url}`
               }
             }
-            caption.replace(/#[^\s]+(?=(?:\s|$))/g,"").replaceAll("\n\n\n","\n")
+            
             client.sendMessage(i.to, {
               video: buffer,
-              caption: caption,
+              caption: caption.replace(/#[^\s]+(?=(?:\s|$))/g,"").replaceAll("\n\n\n","\n"),
             });
     }
         }
