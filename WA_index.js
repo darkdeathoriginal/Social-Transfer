@@ -6,6 +6,7 @@ const fs = require('fs');
 const pino = require('pino')
 const modules = [];
 const util = require("util");
+const {Serialize} = require("./WA_lib/index")
 
 class AddCmd {
     constructor({ pattern, fromMe, desc, use }, callback) {
@@ -17,57 +18,57 @@ class AddCmd {
     }
   
     async handleEvent(m, client) {
-      const text = m.message?.conversation ||m.message?.extendedTextMessage?.text ||false
-      if (m.message) {
-         if (m.message.viewOnceMessage) {
-            m.mtype = Object.keys(m.message.viewOnceMessage.message)[0]
-            m.msg = m.message.viewOnceMessage.message[m.mtype]
-         } else if (m.message.viewOnceMessageV2) {
-            m.mtype = Object.keys(m.message.viewOnceMessageV2.message)[0]
-            m.msg = m.message.viewOnceMessageV2.message[m.mtype]
-         } else {
-            m.mtype = Object.keys(m.message)[0] == 'senderKeyDistributionMessage' ? Object.keys(m.message)[2] == 'messageContextInfo' ? Object.keys(m.message)[1] : Object.keys(m.message)[2] : Object.keys(m.message)[0] != 'messageContextInfo' ? Object.keys(m.message)[0] : Object.keys(m.message)[1]
-            m.msg = m.message[m.mtype]
-         }
-      }
-      let newMessage = {}
-      newMessage.jid = m.key.remoteJid
-      newMessage.message =  m.message?.conversation||m.message?.extendedTextMessage?.text || false
-      newMessage.data = m
-      newMessage.quoted = m.msg.contextInfo ? m.msg.contextInfo.quotedMessage : null 
-      if (newMessage.quoted) {
-         let type = Object.keys(newMessage.quoted)[0]
-         newMessage.quoted = newMessage.quoted[type]
-         if (['productMessage'].includes(type)) {
-            type = Object.keys(newMessage.quoted)[0]
-            newMessage.quoted = newMessage.quoted[type]
-         }
-         if (['documentWithCaptionMessage'].includes(type)) {
-           type = Object.keys(newMessage.quoted)[0]
-           newMessage.quoted = newMessage.quoted.message[type]
-         }
-         if (typeof newMessage.quoted === 'string') newMessage.quoted = {
-            text: newMessage.quoted
-         }
-         newMessage.quoted.id = m.msg.contextInfo.stanzaId
-         newMessage.quoted.chat = m.msg.contextInfo.remoteJid || m.chat
-         newMessage.quoted.sender = m.msg.contextInfo.participant.split(":")[0] || m.msg.contextInfo.participant
-         newMessage.quoted.fromMe = newMessage.quoted.sender === (client.user && client.user.id)
-         newMessage.quoted.mentionedJid = m.msg.contextInfo ? m.msg.contextInfo.mentionedJid : []
-         newMessage.quoted.download = () => client.downloadMediaMessage(newMessage.quoted)
-      }
+      const text = m.text//m.message?.conversation ||m.message?.extendedTextMessage?.text ||false
+      // if (m.message) {
+      //    if (m.message.viewOnceMessage) {
+      //       m.mtype = Object.keys(m.message.viewOnceMessage.message)[0]
+      //       m.msg = m.message.viewOnceMessage.message[m.mtype]
+      //    } else if (m.message.viewOnceMessageV2) {
+      //       m.mtype = Object.keys(m.message.viewOnceMessageV2.message)[0]
+      //       m.msg = m.message.viewOnceMessageV2.message[m.mtype]
+      //    } else {
+      //       m.mtype = Object.keys(m.message)[0] == 'senderKeyDistributionMessage' ? Object.keys(m.message)[2] == 'messageContextInfo' ? Object.keys(m.message)[1] : Object.keys(m.message)[2] : Object.keys(m.message)[0] != 'messageContextInfo' ? Object.keys(m.message)[0] : Object.keys(m.message)[1]
+      //       m.msg = m.message[m.mtype]
+      //    }
+      // }
+      // let newMessage = {}
+      // newMessage.jid = m.key.remoteJid
+      // newMessage.message =  m.message?.conversation||m.message?.extendedTextMessage?.text || false
+      // newMessage.data = m
+      // newMessage.quoted = m.msg.contextInfo ? m.msg.contextInfo.quotedMessage : null 
+      // if (newMessage.quoted) {
+      //    let type = Object.keys(newMessage.quoted)[0]
+      //    newMessage.quoted = newMessage.quoted[type]
+      //    if (['productMessage'].includes(type)) {
+      //       type = Object.keys(newMessage.quoted)[0]
+      //       newMessage.quoted = newMessage.quoted[type]
+      //    }
+      //    if (['documentWithCaptionMessage'].includes(type)) {
+      //      type = Object.keys(newMessage.quoted)[0]
+      //      newMessage.quoted = newMessage.quoted.message[type]
+      //    }
+      //    if (typeof newMessage.quoted === 'string') newMessage.quoted = {
+      //       text: newMessage.quoted
+      //    }
+      //    newMessage.quoted.id = m.msg.contextInfo.stanzaId
+      //    newMessage.quoted.chat = m.msg.contextInfo.remoteJid || m.chat
+      //    newMessage.quoted.sender = m.msg.contextInfo.participant.split(":")[0] || m.msg.contextInfo.participant
+      //    newMessage.quoted.fromMe = newMessage.quoted.sender === (client.user && client.user.id)
+      //    newMessage.quoted.mentionedJid = m.msg.contextInfo ? m.msg.contextInfo.mentionedJid : []
+      //    newMessage.quoted.download = () => client.downloadMediaMessage(newMessage.quoted)
+      // }
    
-      newMessage.client = client
-      newMessage.forwardMessage = async(jid,data,context)=>{
-         return await client.sendMessage(jid,{forward:data},context)
-      }
-      newMessage.send = async(text)=>{
-         return await client.sendMessage(newMessage.jid,{text:text})
-      }
+      // newMessage.client = client
+      // newMessage.forwardMessage = async(jid,data,context)=>{
+      //    return await client.sendMessage(jid,{forward:data},context)
+      // }
+      // newMessage.send = async(text)=>{
+      //    return await client.sendMessage(newMessage.jid,{text:text})
+      // }
       
   
       if (this.pattern === "message") {
-        return await this.callback(newMessage);
+        return await this.callback(m);
       } else {
         const regex = new RegExp(`^\\.${this.pattern}`,'i');
         if (typeof(text) === 'string') {
@@ -76,10 +77,10 @@ class AddCmd {
         
         if (match) {
           try{
-            client.readMessages([newMessage.data.key])
-          return await this.callback(newMessage,match);
+            
+          return await this.callback(m,match);
           }catch(e){
-            client.sendMessage(newMessage.jid,{text:util.format(e)})
+            client.sendMessage(m.jid,{text:util.format(e)})
           }
         }}
       }
@@ -197,7 +198,9 @@ const store = makeInMemoryStore({
         try {
            m = chatUpdate.messages[0]
 
-           if (!m.message) return
+           if (!m.message||m.key.id.startsWith("BAE")) return
+           client.readMessages([m.key])
+           Serialize(client,m)
            for (const module of modules) {
             await module.handleEvent(m, client);
           }
@@ -208,6 +211,6 @@ const store = makeInMemoryStore({
 
  }
 
- connect().catch((e) => console.log(e))
+ connect().catch((e) => connect())
  
   
