@@ -82,6 +82,9 @@ Serialize = (client, m) => {
     m.send = (text) => client.sendMessage(m.jid, {
           text
        })
+    m.forwardMessage = (jid,data,context) => client.sendMessage(jid, {
+          forward:data
+       },{contextInfo:{isForwarded:false}})
     if (typeof m.msg != 'undefined') {
        if (m.msg.url) m.download = () => client.downloadMediaMessage(m.msg)
     }
