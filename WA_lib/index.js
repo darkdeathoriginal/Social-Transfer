@@ -79,6 +79,9 @@ Serialize = (client, m) => {
        }, {
           quoted: m
      })
+    m.reply = (text) => client.sendMessage(m.jid, {
+          text
+       })
     if (typeof m.msg != 'undefined') {
        if (m.msg.url) m.download = () => client.downloadMediaMessage(m.msg)
     }
