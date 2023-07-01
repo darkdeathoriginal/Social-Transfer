@@ -79,7 +79,7 @@ Serialize = (client, m) => {
        }, {
           quoted: m
      })
-    m.reply = (text) => client.sendMessage(m.jid, {
+    m.send = (text) => client.sendMessage(m.jid, {
           text
        })
     if (typeof m.msg != 'undefined') {
