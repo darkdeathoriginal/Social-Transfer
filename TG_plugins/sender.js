@@ -76,7 +76,7 @@ Module(
           const buffer = await m.client.downloadMedia(media, {
             workers: 14,
           });
-          if (result[0]?.media?.photo ||media?.photowebpage) {
+          if (result[0]?.media?.photo ||media?.media?.photowebpage) {
             let caption = result[0].message || ""
             if(result[0]?.replyMarkup?.rows[0]?.buttons){
               for(let i of result[0].replyMarkup.rows[2]?result[0].replyMarkup.rows[1].buttons:result[0].replyMarkup.rows[0].buttons){
