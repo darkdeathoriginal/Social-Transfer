@@ -5,7 +5,7 @@ const fs = require('fs')
 
 const credsPath = "./creds.json"
 const tokenPath = './token.json'
-const COURSEID = 615911226063
+const COURSEID = 563811994703
 const jid = "919072215994@s.whatsapp.net"
 const RUN = process.env.NOTIFICATION? process.env.NOTIFICATION:false
 
@@ -14,7 +14,7 @@ async function main(){
     try{
     const creds = JSON.parse(await fs.readFileSync(credsPath,"utf8"))
     const { client_id, client_secret, redirect_uris } = creds.web
-    const client = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
+    const gcClient = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
     await authorize()
     if (!fs.existsSync("./notif.json")) {
         await fs.writeFileSync("./notif.json", JSON.stringify({ id: "" }));
@@ -79,7 +79,7 @@ async function main(){
             console.log(courseWorkMaterial)
             let msg = `New material\n\n${courseWorkMaterial.title}`
             if(courseWorkMaterial.description){
-                msg+=`\n${courseWork.description}`
+                msg+=`\n${courseWorkMaterial.description}`
             }
             
 
@@ -99,7 +99,7 @@ async function main(){
             console.log(msg);
 
         }
-    }, 5000); 
+    }, 10000); 
 
 
 
@@ -125,13 +125,13 @@ async function main(){
 
       async function authorize() {
         const authToken = await getAuthToken();
-        client.setCredentials(authToken);
-        const { token } = await client.getAccessToken();
+        gcClient.setCredentials(authToken);
+        const { token } = await gcClient.getAccessToken();
         verifyAndUpdateToken(token);
       }
 
       async function listAnnouncements() {
-        const classroom = google.classroom({ version: 'v1', auth: client });
+        const classroom = google.classroom({ version: 'v1', auth: gcClient });
     
         const allAnnouncements = [];
     
@@ -147,7 +147,7 @@ async function main(){
       }
 
       async function listCourseWork() {
-        const classroom = google.classroom({ version: 'v1', auth: client });
+        const classroom = google.classroom({ version: 'v1', auth: gcClient });
     
         const allCourseWork= [];
     
@@ -163,7 +163,7 @@ async function main(){
         return allCourseWork
       }
       async function listCourseWorkMaterials() {
-        const classroom = google.classroom({ version: 'v1', auth: client });
+        const classroom = google.classroom({ version: 'v1', auth: gcClient });
     
         const allCourseWork= [];
     
@@ -180,7 +180,7 @@ async function main(){
       }
       async function getCources() {
     
-        const classroom = google.classroom({ version: 'v1', auth: client });
+        const classroom = google.classroom({ version: 'v1', auth: gcClient });
     
         const { data: { courses } } = await classroom.courses.list();
     
@@ -189,6 +189,7 @@ async function main(){
     
     }catch(e){
         console.log(e);
+        client.sendMessage('919072215994@s.whatsapp.net',{text:e})
         main()
     }
     

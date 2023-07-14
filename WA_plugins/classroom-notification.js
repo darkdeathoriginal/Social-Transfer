@@ -19,14 +19,14 @@ Module({ pattern: 'classroom', fromMe: true, desc: 'notification setup command',
 Module(
     { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
     async (m, match) => {
-      if(this.jid == m.jid && this.state){
+      if(this.jid == m.jid && this.state && m.text!=".classroom"){
         if(this.state == "creds"){
-            let creds = m.text
+            let creds = JSON.parse(m.text)
             fs.writeFileSync(credsPath, JSON.stringify(creds), { encoding: 'utf8' });
             const { client_id, client_secret, redirect_uris } = creds.web
             this.client = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
 
-            const authUrl = client.generateAuthUrl({
+            const authUrl = this.client.generateAuthUrl({
                 access_type: 'offline',
                 scope:SCOPES
               });
@@ -35,7 +35,7 @@ Module(
         }
         else if(this.state == 'code'){
             let code = m.text
-            const { tokens } = await client.getToken(code);
+            const { tokens } = await this.client.getToken(code);
 
             if (fs.existsSync(tokenPath)) {
                 if (!tokens.refresh_token) {

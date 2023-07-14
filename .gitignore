@@ -3,3 +3,6 @@ bot.db
 package-lock.json
 session
 .env
+creds.json
+notif.json
+token.json
