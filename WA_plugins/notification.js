@@ -136,7 +136,7 @@ async function main(){
         const allAnnouncements = [];
     
           const { data }  = await classroom.courses.announcements.list({
-            courseId: 615911226063
+            courseId: COURSEID
           });
           if (data) {
             allAnnouncements.push(...data.announcements);
