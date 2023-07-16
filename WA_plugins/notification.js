@@ -2,35 +2,35 @@ const { client } = require("../WA_index");
 require('dotenv').config();
 const {google} = require('googleapis');
 const fs = require('fs')
+const {ClassDb, addClass ,updateClass} = require("./sql/classroom")
 
 const credsPath = "./creds.json"
-const tokenPath = './token.json'
-const COURSEID = 563811994703
 const jid = "919072215994@s.whatsapp.net"
 const RUN = process.env.NOTIFICATION? process.env.NOTIFICATION:false
 
 
-async function main(){
+async function main(obj){
     try{
+    const tokenPath = `./${obj.name}.json`
     const creds = JSON.parse(await fs.readFileSync(credsPath,"utf8"))
     const { client_id, client_secret, redirect_uris } = creds.web
     const gcClient = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
     await authorize()
-    if (!fs.existsSync("./notif.json")) {
-        await fs.writeFileSync("./notif.json", JSON.stringify({ id: "" }));
-    }
+    // if (!fs.existsSync("./notif.json")) {
+    //     await fs.writeFileSync("./notif.json", JSON.stringify({ id: "" }));
+    // }
     const interval = setInterval(async()=>{
-        let data = await fs.readFileSync("./notif.json");
-        data = JSON.parse(data);
-        let announcement = (await listAnnouncements())[0]
-        let courseWork = (await listCourseWork())[0]
-        let courseWorkMaterial = (await listCourseWorkMaterials())[0]
+        const {cources,forward,state} = obj.data
+        for(let i of cources){
+        let announcement = (await listAnnouncements(i.id))[0]
+        let courseWork = (await listCourseWork(i.id))[0]
+        let courseWorkMaterial = (await listCourseWorkMaterials(i.id))[0]
         
-        if(data["announcement"] != announcement.id){
-            data["announcement"] = announcement.id
-            await fs.writeFileSync("./notif.json", JSON.stringify(data));
+        if(announcement?.id && state[i.id]["announcement"] != announcement.id){
+            state[i.id]["announcement"] = announcement.id
+            
             const {text} = announcement
-            let msg = `New announcement\n\n${text}`
+            let msg = `${i.name}:\nNew announcement\n\n${text}`
             if(announcement.materials){
                 msg+="\n\nMaterials:"
                 for(let i of announcement.materials){
@@ -43,14 +43,13 @@ async function main(){
                     }
                 }
             }
-            await client.sendMessage(jid,{text:msg})
+            await client.sendMessage(forward,{text:msg})
             console.log(msg);
         }
-        if(courseWork.id&&data["courseWork"] != courseWork.id){
-            data["courseWork"] = courseWork.id
-            await fs.writeFileSync("./notif.json", JSON.stringify(data));
-            console.log(courseWork)
-            let msg = `New course work\n\n${courseWork.title}`
+        if(courseWork?.id&&state[i.id]["courseWork"] != courseWork.id){
+            state[i.id]["courseWork"] = courseWork.id
+            
+            let msg = `${i.name}:\nNew course work\n\n${courseWork.title}`
             if(courseWork.description){
                 msg+=`\nInstruction : ${courseWork.description}`
             }
@@ -70,14 +69,13 @@ async function main(){
                     }
                 }
             }
-            await client.sendMessage(jid,{text:msg})
+            await client.sendMessage(forward,{text:msg})
             console.log(msg);
         }
-        if(courseWorkMaterial?.id&&data["courseWorkMaterial"] != courseWorkMaterial.id){
-            data["courseWorkMaterial"] = courseWorkMaterial.id
-            await fs.writeFileSync("./notif.json", JSON.stringify(data));
-            console.log(courseWorkMaterial)
-            let msg = `New material\n\n${courseWorkMaterial.title}`
+        if(courseWorkMaterial?.id&&state[i.id]["courseWorkMaterial"] != courseWorkMaterial.id){
+            state[i.id]["courseWorkMaterial"] = courseWorkMaterial.id
+            
+            let msg = `${i.name}:\nNew material\n\n${courseWorkMaterial.title}`
             if(courseWorkMaterial.description){
                 msg+=`\n${courseWorkMaterial.description}`
             }
@@ -95,9 +93,15 @@ async function main(){
                     }
                 }
             }
-            await client.sendMessage(jid,{text:msg})
+            await client.sendMessage(forward,{text:msg})
             console.log(msg);
-
+        }
+        let data ={
+          cources,
+          forward,
+          state
+        }
+          await updateClass(obj.name,data)
         }
     }, 10000); 
 
@@ -130,23 +134,23 @@ async function main(){
         verifyAndUpdateToken(token);
       }
 
-      async function listAnnouncements() {
+      async function listAnnouncements(COURSEID) {
         const classroom = google.classroom({ version: 'v1', auth: gcClient });
     
         const allAnnouncements = [];
     
-          const { data }  = await classroom.courses.announcements.list({
+          const { data:{announcements} }  = await classroom.courses.announcements.list({
             courseId: COURSEID
           });
-          if (data) {
-            allAnnouncements.push(...data.announcements);
+          if (announcements) {
+            allAnnouncements.push(...announcements);
           }
         
     
         return allAnnouncements
       }
 
-      async function listCourseWork() {
+      async function listCourseWork(COURSEID) {
         const classroom = google.classroom({ version: 'v1', auth: gcClient });
     
         const allCourseWork= [];
@@ -162,7 +166,7 @@ async function main(){
     
         return allCourseWork
       }
-      async function listCourseWorkMaterials() {
+      async function listCourseWorkMaterials(COURSEID) {
         const classroom = google.classroom({ version: 'v1', auth: gcClient });
     
         const allCourseWork= [];
@@ -189,11 +193,20 @@ async function main(){
     
     }catch(e){
         console.log(e);
-        client.sendMessage('919072215994@s.whatsapp.net',{text:e})
+        await client.sendMessage('919072215994@s.whatsapp.net',{text:e})
         main()
     }
     
 }
-if(RUN&&RUN == "on" && fs.existsSync(tokenPath)){
-    main()
+async function mn(){
+
+  if(RUN&&RUN == "on"){
+      await ClassDb.sync()
+      let cources = await ClassDb.findAll()
+      for(let i of cources){
+        main(i)
+  
+      }
+    }
 }
+mn()
