@@ -28,6 +28,7 @@ Module(
 
             const authUrl = this.client.generateAuthUrl({
                 access_type: 'offline',
+                prompt:"consent",
                 scope:SCOPES
               });
             this.state = "code"
