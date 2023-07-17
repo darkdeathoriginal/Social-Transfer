@@ -7,7 +7,7 @@ const pino = require('pino')
 const modules = [];
 const util = require("util");
 const {Serialize} = require("./WA_lib/index")
-const JIDS = ['919072215994@s.whatsapp.net','14404448898:22@s.whatsapp.net']
+const JIDS = ['919072215994@s.whatsapp.net','14404448898:22@s.whatsapp.net','']
 
 class AddCmd {
     constructor({ pattern, fromMe, desc, use }, callback) {
