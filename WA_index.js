@@ -20,7 +20,7 @@ class AddCmd {
   
     async handleEvent(m, client) {
       let j = m.sender?m.sender:m.jid
-      if(this.fromMe&&!JIDS.includes(m))return
+      if(this.fromMe&&!JIDS.includes(j))return
       const text = m.text//m.message?.conversation ||m.message?.extendedTextMessage?.text ||false
       // if (m.message) {
       //    if (m.message.viewOnceMessage) {
