@@ -22,13 +22,14 @@ async function main(obj){
     const interval = setInterval(async()=>{
         const {cources,forward,state} = obj.data
         for(let i of cources){
+        let haschange = false 
         let announcement = (await listAnnouncements(i.id))[0]
         let courseWork = (await listCourseWork(i.id))[0]
         let courseWorkMaterial = (await listCourseWorkMaterials(i.id))[0]
         
         if(announcement?.id && state[i.id]["announcement"] != announcement.id){
             state[i.id]["announcement"] = announcement.id
-            
+            haschange = true
             const {text} = announcement
             let msg = `${i.name}:\nNew announcement\n\n${text}`
             if(announcement.materials){
@@ -48,7 +49,7 @@ async function main(obj){
         }
         if(courseWork?.id&&state[i.id]["courseWork"] != courseWork.id){
             state[i.id]["courseWork"] = courseWork.id
-            
+            haschange = true
             let msg = `${i.name}:\nNew course work\n\n${courseWork.title}`
             if(courseWork.description){
                 msg+=`\nInstruction : ${courseWork.description}`
@@ -74,7 +75,7 @@ async function main(obj){
         }
         if(courseWorkMaterial?.id&&state[i.id]["courseWorkMaterial"] != courseWorkMaterial.id){
             state[i.id]["courseWorkMaterial"] = courseWorkMaterial.id
-            
+            haschange = true
             let msg = `${i.name}:\nNew material\n\n${courseWorkMaterial.title}`
             if(courseWorkMaterial.description){
                 msg+=`\n${courseWorkMaterial.description}`
@@ -101,7 +102,10 @@ async function main(obj){
           forward,
           state
         }
+        if(haschange){
           await updateClass(obj.name,data)
+
+        }
         }
     }, 10000); 
 

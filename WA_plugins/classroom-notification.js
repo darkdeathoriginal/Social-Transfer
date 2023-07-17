@@ -3,7 +3,7 @@ const {google} = require('googleapis');
 const fs = require('fs')
 const {ClassDb, addClass ,updateClass,deleteClass} = require("./sql/classroom")
 
-const credsPath = "./creds.json"
+const credsPath = "./creds.json"  
 const tokenPath = './token.json'
 const COURSEID = 615911226063
 const SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly','https://www.googleapis.com/auth/classroom.coursework.me.readonly','https://www.googleapis.com/auth/classroom.coursework.students.readonly','https://www.googleapis.com/auth/classroom.push-notifications','https://www.googleapis.com/auth/classroom.announcements.readonly','https://www.googleapis.com/auth/classroom.courseworkmaterials'];
@@ -16,7 +16,7 @@ Module({ pattern: 'classroom', fromMe: true, desc: 'notification setup command',
         return await m.send("plz send the credentials")
     }else{
       let msg = '1. Add new notification\n'+
-                '2. Get information\n'+
+                '2. Change information\n'+
                 '3. Remove notification'
       this.state = "menu"
       this.jid = m.jid
@@ -28,6 +28,10 @@ Module(
     { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
     async (m, match) => {
       if(this.jid == m.jid && this.state && m.text!=".classroom"){
+        if(m.text == "stop"){
+          this.state = false
+          return 0
+        }
         if(this.state == "creds"){
             let creds = JSON.parse(m.text)
             fs.writeFileSync(credsPath, JSON.stringify(creds), { encoding: 'utf8' });
@@ -79,6 +83,20 @@ Module(
           if(no == '1'){
             this.state = "name"
             m.send("Give a name")
+          }
+          else if(no == '2'){
+            let cources = await ClassDb.findAll()
+            let n = 1
+            let msg =''
+            let data = {}
+            for(let i of cources){
+              msg += `${n}. ${i.name}\n`
+              data[n] = i
+              n++
+            }
+            this.data = data
+            this.state = 'query'
+            return await m.send(msg)
           }
           else if(no == '3'){
             this.state = "delete"
@@ -176,6 +194,30 @@ Module(
             this.state = false
             await m.send("Invalid option")
           }
+        }
+        else if(this.state == "query"){
+          var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+          if (!no) throw "_Reply must be  a number_";
+          if(this.data[no]){
+            this.name = this.data[no].name
+            this.data = this.data[no].data
+            this.state = "newjid"
+            return await m.send("Enter new jid")
+          }
+          else{
+            this.state = false
+            await m.send("Invalid option")
+          }
+        }
+        else if(this.state == "newjid"){
+          let jid = m.text
+          this.data.forward = jid
+          let a = await updateClass(this.name,this.data)
+          this.state = false
+          
+          await m.send(a?"Succesfully changed jid":"error")
+          process.exit(0);
+
         }
       }
       
