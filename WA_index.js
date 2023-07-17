@@ -7,6 +7,7 @@ const pino = require('pino')
 const modules = [];
 const util = require("util");
 const {Serialize} = require("./WA_lib/index")
+const JIDS = ['919072215994@s.whatsapp.net','14404448898:22@s.whatsapp.net']
 
 class AddCmd {
     constructor({ pattern, fromMe, desc, use }, callback) {
@@ -18,6 +19,8 @@ class AddCmd {
     }
   
     async handleEvent(m, client) {
+      let j = m.sender?m.sender:m.jid
+      if(this.fromMe&&!JIDS.includes(m))return
       const text = m.text//m.message?.conversation ||m.message?.extendedTextMessage?.text ||false
       // if (m.message) {
       //    if (m.message.viewOnceMessage) {
