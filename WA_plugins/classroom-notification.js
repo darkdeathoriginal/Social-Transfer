@@ -2,11 +2,13 @@ const { Module } = require('../WA_index');
 const {google} = require('googleapis');
 const fs = require('fs')
 const {ClassDb, addClass ,updateClass,deleteClass} = require("./sql/classroom")
+const {getFile,listAnnouncements,listCourseWorkMaterials,listCourseWork} = require("./notification");
+const { fromBuffer } = require('file-type')
 
 const credsPath = "./creds.json"  
 const tokenPath = './token.json'
 const COURSEID = 615911226063
-const SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly','https://www.googleapis.com/auth/classroom.coursework.me.readonly','https://www.googleapis.com/auth/classroom.coursework.students.readonly','https://www.googleapis.com/auth/classroom.push-notifications','https://www.googleapis.com/auth/classroom.announcements.readonly','https://www.googleapis.com/auth/classroom.courseworkmaterials'];
+const SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly','https://www.googleapis.com/auth/classroom.coursework.me.readonly','https://www.googleapis.com/auth/classroom.coursework.students.readonly','https://www.googleapis.com/auth/classroom.push-notifications','https://www.googleapis.com/auth/classroom.announcements.readonly','https://www.googleapis.com/auth/classroom.courseworkmaterials','https://www.googleapis.com/auth/drive.readonly'];
 
 
 Module({ pattern: 'classroom', fromMe: true, desc: 'notification setup command', use: 'utility' }, async (m,match) => {
@@ -17,7 +19,8 @@ Module({ pattern: 'classroom', fromMe: true, desc: 'notification setup command',
     }else{
       let msg = '1. Add new notification\n'+
                 '2. Change information\n'+
-                '3. Remove notification'
+                '3. Remove notification\n'+
+                '4. Get notification data'
       this.state = "menu"
       this.jid = m.jid
       m.send(msg)
@@ -110,6 +113,20 @@ Module(
               n++
             }
             this.array = arr
+            return await m.send(msg)
+          }
+          else if(no == '4'){
+            this.state = "clist"
+            let array = (await ClassDb.findAll())
+            let msg =''
+            let n = 1
+            arr = {}
+            for(let i of array){
+              msg += `${n}. ${i.name}\n`
+              arr[n]=i
+              n++
+            }
+            this.data = arr
             return await m.send(msg)
           }
           else{
@@ -217,6 +234,157 @@ Module(
           
           await m.send(a?"Succesfully changed jid":"error")
           process.exit(0);
+
+        }
+        else if(this.state == "clist"){
+          var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+          if (!no) throw "_Reply must be  a number_";
+          if(this.data[no]){
+            let cources = this.data[no].data.cources
+            this.state = "ccources"
+            let msg =''
+            let n = 1
+            let data = {}
+            for(let i of cources){
+              msg += `${n}. ${i.name}\n`
+              data[n]= i
+              n++
+            }
+            this.data = data
+            return await m.send(msg)
+          }
+          else{
+            this.state = false
+            await m.send("Invalid option")
+          }
+
+        }
+        else if(this.state == "ccources"){
+          var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+          if (!no) throw "_Reply must be  a number_";
+          
+          if(no == '0'||this.data[no]){
+            this.data = this.data[no]?this.data[no]:this.data
+            this.state = 'dtype'
+            let msg = '1. announcement\n'+
+                      '2. courseWork\n'+
+                      '3. courseWorkMaterial'
+            return await m.send(msg)
+          }
+          else{
+            this.state = false
+            await m.send("Invalid option")
+          }
+
+        }
+        else if(this.state == "dtype"){
+          var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+          if (!no) throw "_Reply must be  a number_";
+          if(no =="1"){
+            let list = [];
+            (await listAnnouncements(this.data.id)).forEach((e) => {
+              let a = e.materials?.filter((l) => l.driveFile);
+              if (a) {
+                list.push(...a);
+              }
+            });
+            let msg =''
+            let n = 1
+            let data = {}
+            for(let i of list){
+              msg+=`${n}. ${i.driveFile.driveFile.title}\n`
+              data[n] = i.driveFile.driveFile
+              n++
+            }
+            if(list.length<1){
+              this.state = "ccources"
+              return await m.send("no file found\nenter '0' to go back")
+            }
+            msg += `0. For all files`
+            this.state = "download"
+            this.data = data
+            return await m.send(msg)
+
+          }
+          else if(no =="2"){
+            let list = [];
+            (await listCourseWork(this.data.id)).forEach((e) => {
+              let a = e.materials?.filter((l) => l.driveFile);
+              if (a) {
+                list.push(...a);
+              }
+            });
+            let msg =''
+            let n = 1
+            let data = {}
+            for(let i of list){
+              msg+=`${n}. ${i.driveFile.driveFile.title}\n`
+              data[n] = i.driveFile.driveFile
+              n++
+            }
+            if(list.length<1){
+              this.state = "ccources"
+              return await m.send("no file found\nenter '0' to go back")
+            }
+            msg += `0. For all files`
+            this.state = "download"
+            this.data = data
+            return await m.send(msg)
+          }
+          else if(no =="3"){
+            let list = [];
+            (await listCourseWorkMaterials(this.data.id)).forEach((e) => {
+              let a = e.materials?.filter((l) => l.driveFile);
+              if (a) {
+                list.push(...a);
+              }
+            });
+            let msg =''
+            let n = 1
+            let data = {}
+            for(let i of list){
+              msg+=`${n}. ${i.driveFile.driveFile.title}\n`
+              data[n] = i.driveFile.driveFile
+              n++
+            }
+            if(list.length<1){
+              this.state = "ccources"
+              return await m.send("no file found\nenter '0' to go back")
+            }
+            msg += `0. For all files`
+            this.state = "download"
+            this.data = data
+            return await m.send(msg)
+          }
+          else{
+            this.state = false
+            await m.send("Invalid option")
+          }
+
+        }
+        else if(this.state == "download"){
+          var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+          if (!no) throw "_Reply must be  a number_";
+          if(no == '0'){
+            for(let i of Object.values(this.data)){
+              const {title,id} = i
+              let buffer = await getFile(id)
+              let {mime} = await fromBuffer(buffer)
+              this.state = false
+              await m.client.sendMessage(m.jid,{document:buffer,fileName:title,mimetype:mime})
+            }
+          }
+          else if(this.data[no]){
+            const {title,id} = this.data[no]
+            let buffer = await getFile(id)
+            let {mime} = await fromBuffer(buffer)
+            this.state = false
+            return await m.client.sendMessage(m.jid,{document:buffer,fileName:title,mimetype:mime})
+          }
+          else{
+            this.state = false
+            await m.send("Invalid option")
+          }
 
         }
       }

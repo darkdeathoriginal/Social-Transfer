@@ -3,10 +3,14 @@ require('dotenv').config();
 const {google} = require('googleapis');
 const fs = require('fs')
 const {ClassDb, addClass ,updateClass} = require("./sql/classroom")
+const { Module } = require('../WA_index');
+const { fromBuffer } = require('file-type')
 
 const credsPath = "./creds.json"
 const jid = "919072215994@s.whatsapp.net"
 const RUN = process.env.NOTIFICATION? process.env.NOTIFICATION:false
+let gcClient;
+let array  ={}
 
 
 async function main(obj){
@@ -14,7 +18,7 @@ async function main(obj){
     const tokenPath = `./${obj.name}.json`
     const creds = JSON.parse(await fs.readFileSync(credsPath,"utf8"))
     const { client_id, client_secret, redirect_uris } = creds.web
-    const gcClient = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
+    gcClient = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
     await authorize()
     // if (!fs.existsSync("./notif.json")) {
     //     await fs.writeFileSync("./notif.json", JSON.stringify({ id: "" }));
@@ -23,6 +27,7 @@ async function main(obj){
         const {cources,forward,state} = obj.data
         for(let i of cources){
         let haschange = false 
+        let list = {}
         let announcement = (await listAnnouncements(i.id))[0]
         let courseWork = (await listCourseWork(i.id))[0]
         let courseWorkMaterial = (await listCourseWorkMaterials(i.id))[0]
@@ -34,17 +39,24 @@ async function main(obj){
             let msg = `${i.name}:\nNew announcement\n\n${text}`
             if(announcement.materials){
                 msg+="\n\nMaterials:"
+                let n = 1
                 for(let i of announcement.materials){
                     if(i.driveFile){
                         const {id,title} = i.driveFile.driveFile
+                        list[n]={id,title} 
                         msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
+                        n++
                     }
                     if(i.link){
                         msg+=`\n${i.link.url}`
                     }
                 }
             }
-            await client.sendMessage(forward,{text:msg})
+            let a = await client.sendMessage(forward,{text:msg})
+            if(list[1]){
+              array[a.key.id] = list
+              list = []
+            }
             console.log(msg);
         }
         if(courseWork?.id&&state[i.id]["courseWork"] != courseWork.id){
@@ -60,17 +72,24 @@ async function main(obj){
 
             if(courseWork.materials){
                 msg+="\n\nMaterials:"
+                let n = 1
                 for(let i of courseWork.materials){
                     if(i.driveFile){
-                        const {id,title} = i.driveFile.driveFile
-                        msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
+                      const {id,title} = i.driveFile.driveFile
+                      list[n]={id,title} 
+                      msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
+                      n++
                     }
                     if(i.link){
                         msg+=`\n${i.link.url}`
                     }
                 }
             }
-            await client.sendMessage(forward,{text:msg})
+            let a = await client.sendMessage(forward,{text:msg})
+            if(list[1]){
+              array[a.key.id] = list
+              list = []
+            }
             console.log(msg);
         }
         if(courseWorkMaterial?.id&&state[i.id]["courseWorkMaterial"] != courseWorkMaterial.id){
@@ -84,17 +103,24 @@ async function main(obj){
 
             if(courseWorkMaterial.materials){
                 msg+="\n\nMaterials:"
+                let n =1
                 for(let i of courseWorkMaterial.materials){
                     if(i.driveFile){
-                        const {id,title} = i.driveFile.driveFile
-                        msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
+                      const {id,title} = i.driveFile.driveFile
+                      list[n]={id,title} 
+                      msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
+                      n++
                     }
                     if(i.link){
                         msg+=`\n${i.link.url}`
                     }
                 }
             }
-            await client.sendMessage(forward,{text:msg})
+            let a = await client.sendMessage(forward,{text:msg})
+            if(list[1]){
+              array[a.key.id] = list
+              list = []
+            }
             console.log(msg);
         }
         let data ={
@@ -138,63 +164,7 @@ async function main(obj){
         verifyAndUpdateToken(token);
       }
 
-      async function listAnnouncements(COURSEID) {
-        const classroom = google.classroom({ version: 'v1', auth: gcClient });
-    
-        const allAnnouncements = [];
-    
-          const { data:{announcements} }  = await classroom.courses.announcements.list({
-            courseId: COURSEID
-          });
-          if (announcements) {
-            allAnnouncements.push(...announcements);
-          }
-        
-    
-        return allAnnouncements
-      }
-
-      async function listCourseWork(COURSEID) {
-        const classroom = google.classroom({ version: 'v1', auth: gcClient });
-    
-        const allCourseWork= [];
-    
-          const { data: { courseWork } } = await classroom.courses.courseWork.list({
-            courseId: COURSEID
-          });
-    
-          if (courseWork) {
-            allCourseWork.push(...courseWork);
-          }
-        
-    
-        return allCourseWork
-      }
-      async function listCourseWorkMaterials(COURSEID) {
-        const classroom = google.classroom({ version: 'v1', auth: gcClient });
-    
-        const allCourseWork= [];
-    
-          const { data: { courseWorkMaterial } } = await classroom.courses.courseWorkMaterials.list({
-            courseId: COURSEID
-          });
-    
-          if (courseWorkMaterial) {
-            allCourseWork.push(...courseWorkMaterial);
-          }
-        
-    
-        return allCourseWork
-      }
-      async function getCources() {
-    
-        const classroom = google.classroom({ version: 'v1', auth: gcClient });
-    
-        const { data: { courses } } = await classroom.courses.list();
-    
-        return courses
-      }
-    
+      
     }catch(e){
         console.log(e);
         await client.sendMessage('919072215994@s.whatsapp.net',{text:e})
@@ -214,3 +184,100 @@ async function mn(){
     }
 }
 mn()
+async function listAnnouncements(COURSEID) {
+  const classroom = google.classroom({ version: 'v1', auth: gcClient });
+
+  const allAnnouncements = [];
+
+    const { data:{announcements} }  = await classroom.courses.announcements.list({
+      courseId: COURSEID
+    });
+    if (announcements) {
+      allAnnouncements.push(...announcements);
+    }
+  
+
+  return allAnnouncements
+}
+
+async function listCourseWork(COURSEID) {
+  const classroom = google.classroom({ version: 'v1', auth: gcClient });
+
+  const allCourseWork= [];
+
+    const { data: { courseWork } } = await classroom.courses.courseWork.list({
+      courseId: COURSEID
+    });
+
+    if (courseWork) {
+      allCourseWork.push(...courseWork);
+    }
+  
+
+  return allCourseWork
+}
+async function listCourseWorkMaterials(COURSEID) {
+  const classroom = google.classroom({ version: 'v1', auth: gcClient });
+
+  const allCourseWork= [];
+
+    const { data: { courseWorkMaterial } } = await classroom.courses.courseWorkMaterials.list({
+      courseId: COURSEID
+    });
+
+    if (courseWorkMaterial) {
+      allCourseWork.push(...courseWorkMaterial);
+    }
+  
+
+  return allCourseWork
+}
+async function getCources() {
+
+  const classroom = google.classroom({ version: 'v1', auth: gcClient });
+
+  const { data: { courses } } = await classroom.courses.list();
+
+  return courses
+}
+async function getFile(fileId){
+  const drive = google.drive({ version: 'v3', auth: gcClient });
+
+  try {
+
+
+    const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'arraybuffer' });
+
+    return Buffer.from(res.data)
+
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+Module(
+  { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
+  async (m, match) => {
+    if(array[m.quoted?.id]){
+      var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+      if (!no) throw "_Reply must be  a number_";
+      let data = array[m.quoted.id]
+      if(data[no]){
+        const {id,title} = data[no]
+        let buffer = await getFile(id)
+        let {mime} = await fromBuffer(buffer)
+        this.state = false
+        return await m.client.sendMessage(m.jid,{document:buffer,fileName:title,mimetype:mime})
+      }
+      else{
+        return await m.send("invalid number")
+      }
+    }
+    else{
+      return 0;
+    }
+  }
+);
+
+module.exports = {getFile,listAnnouncements,listCourseWorkMaterials,listCourseWork}
