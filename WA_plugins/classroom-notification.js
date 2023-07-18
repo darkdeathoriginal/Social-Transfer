@@ -2,7 +2,7 @@ const { Module } = require('../WA_index');
 const {google} = require('googleapis');
 const fs = require('fs')
 const {ClassDb, addClass ,updateClass,deleteClass} = require("./sql/classroom")
-const {getFile,listAnnouncements,listCourseWorkMaterials,listCourseWork} = require("./notification");
+const {getFile,listAnnouncements,listCourseWorkMaterials,listCourseWork,gcClients} = require("./notification");
 const { fromBuffer } = require('file-type')
 
 const credsPath = "./creds.json"  
@@ -241,6 +241,7 @@ Module(
           if (!no) throw "_Reply must be  a number_";
           if(this.data[no]){
             let cources = this.data[no].data.cources
+            this.name = this.data[no].name
             this.state = "ccources"
             let msg =''
             let n = 1
@@ -262,7 +263,6 @@ Module(
         else if(this.state == "ccources"){
           var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
           if (!no) throw "_Reply must be  a number_";
-          
           if(no == '0'||this.data[no]){
             this.data = this.data[no]?this.data[no]:this.data
             this.state = 'dtype'
@@ -282,7 +282,7 @@ Module(
           if (!no) throw "_Reply must be  a number_";
           if(no =="1"){
             let list = [];
-            (await listAnnouncements(this.data.id)).forEach((e) => {
+            (await listAnnouncements(this.data.id,gcClients[this.name])).forEach((e) => {
               let a = e.materials?.filter((l) => l.driveFile);
               if (a) {
                 list.push(...a);
@@ -308,7 +308,7 @@ Module(
           }
           else if(no =="2"){
             let list = [];
-            (await listCourseWork(this.data.id)).forEach((e) => {
+            (await listCourseWork(this.data.id,gcClients[this.name])).forEach((e) => {
               let a = e.materials?.filter((l) => l.driveFile);
               if (a) {
                 list.push(...a);
@@ -333,7 +333,7 @@ Module(
           }
           else if(no =="3"){
             let list = [];
-            (await listCourseWorkMaterials(this.data.id)).forEach((e) => {
+            (await listCourseWorkMaterials(this.data.id,gcClients[this.name])).forEach((e) => {
               let a = e.materials?.filter((l) => l.driveFile);
               if (a) {
                 list.push(...a);
@@ -368,7 +368,7 @@ Module(
           if(no == '0'){
             for(let i of Object.values(this.data)){
               const {title,id} = i
-              let buffer = await getFile(id)
+              let buffer = await getFile(id,gcClients[this.name])
               let {mime} = await fromBuffer(buffer)
               this.state = false
               await m.client.sendMessage(m.jid,{document:buffer,fileName:title,mimetype:mime})
@@ -376,7 +376,7 @@ Module(
           }
           else if(this.data[no]){
             const {title,id} = this.data[no]
-            let buffer = await getFile(id)
+            let buffer = await getFile(id,gcClients[this.name])
             let {mime} = await fromBuffer(buffer)
             this.state = false
             return await m.client.sendMessage(m.jid,{document:buffer,fileName:title,mimetype:mime})

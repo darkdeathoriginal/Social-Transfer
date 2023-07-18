@@ -2,24 +2,32 @@ const { client } = require("../WA_index");
 require('dotenv').config();
 const {google} = require('googleapis');
 const fs = require('fs')
-const {ClassDb, addClass ,updateClass} = require("./sql/classroom")
+const {ClassDb,updateClass} = require("./sql/classroom")
 const { Module } = require('../WA_index');
 const { fromBuffer } = require('file-type')
 
 const credsPath = "./creds.json"
 const jid = "919072215994@s.whatsapp.net"
 const RUN = process.env.NOTIFICATION? process.env.NOTIFICATION:false
-let gcClient;
+let gcClients = {}
 let array  ={}
 
 
 async function main(obj){
     try{
     const tokenPath = `./${obj.name}.json`
-    const creds = JSON.parse(await fs.readFileSync(credsPath,"utf8"))
-    const { client_id, client_secret, redirect_uris } = creds.web
-    gcClient = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
-    await authorize()
+    let gcClient;
+    if(gcClients[obj.name]){
+      gcClient = gcClients[obj.name]
+    }
+    else{
+      const creds = JSON.parse(await fs.readFileSync(credsPath,"utf8"))
+      const { client_id, client_secret, redirect_uris } = creds.web
+      gcClient = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
+      await authorize()
+      gcClients[obj.name] = gcClient
+
+    }
     // if (!fs.existsSync("./notif.json")) {
     //     await fs.writeFileSync("./notif.json", JSON.stringify({ id: "" }));
     // }
@@ -28,9 +36,9 @@ async function main(obj){
         for(let i of cources){
         let haschange = false 
         let list = {}
-        let announcement = (await listAnnouncements(i.id))[0]
-        let courseWork = (await listCourseWork(i.id))[0]
-        let courseWorkMaterial = (await listCourseWorkMaterials(i.id))[0]
+        let announcement = (await listAnnouncements(i.id,gcClient))[0]
+        let courseWork = (await listCourseWork(i.id,gcClient))[0]
+        let courseWorkMaterial = (await listCourseWorkMaterials(i.id,gcClient))[0]
         
         if(announcement?.id && state[i.id]["announcement"] != announcement.id){
             state[i.id]["announcement"] = announcement.id
@@ -43,7 +51,7 @@ async function main(obj){
                 for(let i of announcement.materials){
                     if(i.driveFile){
                         const {id,title} = i.driveFile.driveFile
-                        list[n]={id,title} 
+                        list[n]={id,title,name:obj.name} 
                         msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
                         n++
                     }
@@ -76,7 +84,7 @@ async function main(obj){
                 for(let i of courseWork.materials){
                     if(i.driveFile){
                       const {id,title} = i.driveFile.driveFile
-                      list[n]={id,title} 
+                      list[n]={id,title,name:obj.name} 
                       msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
                       n++
                     }
@@ -107,7 +115,7 @@ async function main(obj){
                 for(let i of courseWorkMaterial.materials){
                     if(i.driveFile){
                       const {id,title} = i.driveFile.driveFile
-                      list[n]={id,title} 
+                      list[n]={id,title,name:obj.name} 
                       msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
                       n++
                     }
@@ -184,7 +192,7 @@ async function mn(){
     }
 }
 mn()
-async function listAnnouncements(COURSEID) {
+async function listAnnouncements(COURSEID,gcClient) {
   const classroom = google.classroom({ version: 'v1', auth: gcClient });
 
   const allAnnouncements = [];
@@ -200,7 +208,7 @@ async function listAnnouncements(COURSEID) {
   return allAnnouncements
 }
 
-async function listCourseWork(COURSEID) {
+async function listCourseWork(COURSEID,gcClient) {
   const classroom = google.classroom({ version: 'v1', auth: gcClient });
 
   const allCourseWork= [];
@@ -216,7 +224,7 @@ async function listCourseWork(COURSEID) {
 
   return allCourseWork
 }
-async function listCourseWorkMaterials(COURSEID) {
+async function listCourseWorkMaterials(COURSEID,gcClient) {
   const classroom = google.classroom({ version: 'v1', auth: gcClient });
 
   const allCourseWork= [];
@@ -240,7 +248,7 @@ async function getCources() {
 
   return courses
 }
-async function getFile(fileId){
+async function getFile(fileId,gcClient){
   const drive = google.drive({ version: 'v3', auth: gcClient });
 
   try {
@@ -264,8 +272,8 @@ Module(
       if (!no) throw "_Reply must be  a number_";
       let data = array[m.quoted.id]
       if(data[no]){
-        const {id,title} = data[no]
-        let buffer = await getFile(id)
+        const {id,title,name} = data[no]
+        let buffer = await getFile(id,gcClients[name])
         let {mime} = await fromBuffer(buffer)
         this.state = false
         return await m.client.sendMessage(m.jid,{document:buffer,fileName:title,mimetype:mime})
@@ -280,4 +288,4 @@ Module(
   }
 );
 
-module.exports = {getFile,listAnnouncements,listCourseWorkMaterials,listCourseWork}
+module.exports = {getFile,listAnnouncements,listCourseWorkMaterials,listCourseWork,gcClients}
