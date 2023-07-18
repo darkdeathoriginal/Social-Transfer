@@ -50,9 +50,9 @@ async function main(obj){
                 let n = 1
                 for(let i of announcement.materials){
                     if(i.driveFile){
-                        const {id,title} = i.driveFile.driveFile
-                        list[n]={id,title,name:obj.name} 
-                        msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
+                      const {id,title,alternateLink} = i.driveFile.driveFile
+                      list[n]={id,title,name:obj.name} 
+                      msg+=`\n${title} : ${alternateLink}`
                         n++
                     }
                     if(i.link){
@@ -83,9 +83,9 @@ async function main(obj){
                 let n = 1
                 for(let i of courseWork.materials){
                     if(i.driveFile){
-                      const {id,title} = i.driveFile.driveFile
+                      const {id,title,alternateLink} = i.driveFile.driveFile
                       list[n]={id,title,name:obj.name} 
-                      msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
+                      msg+=`\n${title} : ${alternateLink}`
                       n++
                     }
                     if(i.link){
@@ -114,9 +114,9 @@ async function main(obj){
                 let n =1
                 for(let i of courseWorkMaterial.materials){
                     if(i.driveFile){
-                      const {id,title} = i.driveFile.driveFile
+                      const {id,title,alternateLink} = i.driveFile.driveFile
                       list[n]={id,title,name:obj.name} 
-                      msg+=`\n${title} : https://drive.google.com/uc?id=${id}&export=download`
+                      msg+=`\n${title} : ${alternateLink}`
                       n++
                     }
                     if(i.link){
