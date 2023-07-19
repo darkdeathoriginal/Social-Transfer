@@ -11,6 +11,7 @@ Module(
         if (commits.total === 0) {
             mss = "**Bot up to date!**"
             return await m.send(mss);
+            
         }
 
         else if(match[1] == "start"){
