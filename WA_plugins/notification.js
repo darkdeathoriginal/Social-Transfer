@@ -248,6 +248,14 @@ async function getCources() {
 
   return courses
 }
+async function getTeachers(COURSEID,gcClient) {
+
+  const classroom = google.classroom({ version: 'v1', auth: gcClient });
+
+  return (await classroom.courses.teachers.list({
+    courseId:COURSEID
+  })).data.teachers
+}
 async function getFile(fileId,gcClient){
   const drive = google.drive({ version: 'v3', auth: gcClient });
 

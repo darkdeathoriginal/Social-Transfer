@@ -38,16 +38,8 @@ Module(
         if(this.state == "creds"){
             let creds = JSON.parse(m.text)
             fs.writeFileSync(credsPath, JSON.stringify(creds), { encoding: 'utf8' });
-            const { client_id, client_secret, redirect_uris } = creds.web
-            this.client = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
-
-            const authUrl = this.client.generateAuthUrl({
-                access_type: 'offline',
-                prompt:"consent",
-                scope:SCOPES
-              });
-            this.state = "code"
-            return await m.send(`Open this URL to authorize the application: ${authUrl}`);
+            this.state = false
+            return await m.send(`succesfully set creds`);
         }
         else if(this.state == 'code'){
             let code = m.text
