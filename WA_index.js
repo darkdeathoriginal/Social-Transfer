@@ -193,6 +193,7 @@ const store = makeInMemoryStore({
               await props.save()
               process.exit(0)
            } else {
+               connect()
            }
         }
      })
@@ -208,7 +209,7 @@ const store = makeInMemoryStore({
             await module.handleEvent(m, client);
           }
         } catch (e) {
-           console.log(e)
+           throw(e)
         }
      })
 
