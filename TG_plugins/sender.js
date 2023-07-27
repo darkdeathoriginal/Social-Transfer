@@ -96,11 +96,16 @@ Module(
                 caption += `\n${i.text} : ${i.url}`
               }
             }
-            
-            client.sendMessage(i.to, {
+            let a = await client.sendMessage('120363143238645150@g.us', {
               video: buffer,
               caption: caption.replace(/#[^\s]+(?=(?:\s|$))/g,"").replaceAll("\n\n\n","\n"),
             });
+            var x = JSON.stringify(a).replace("videoMessage","ptvMessage")
+            await client.copyNForward(i.to,JSON.parse(x))
+            // client.sendMessage(i.to, {
+            //   video: buffer,
+            //   caption: caption.replace(/#[^\s]+(?=(?:\s|$))/g,"").replaceAll("\n\n\n","\n"),
+            // });
     }
         }
       }
