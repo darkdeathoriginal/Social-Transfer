@@ -44,7 +44,7 @@ Module({ pattern: 'update ?(.*)', fromMe: true, desc: 'change profile picture', 
         else {
             var changelog = "Pending updates:\n\n";
             for (var i in commits.all){
-            changelog += `${(parseInt(i)+1)}• **${commits.all[i].message}**\n`
+            changelog += `${(parseInt(i)+1)}• *${commits.all[i].message}*\n`
             }
         }
 
