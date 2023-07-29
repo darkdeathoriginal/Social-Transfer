@@ -29,7 +29,7 @@ Module({ pattern: 'update ?(.*)', fromMe: true, desc: 'change profile picture', 
     var commits = await git.log(['main' + '..origin/' + 'main']);
         var mss = '';
         if (commits.total === 0) {
-            mss = "**Bot up to date!**"
+            mss = "*Bot up to date!*"
             return await m.send(mss);
             
         }
