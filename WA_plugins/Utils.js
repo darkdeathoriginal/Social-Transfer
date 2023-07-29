@@ -33,8 +33,7 @@ Module({ pattern: 'pp', fromMe: true, desc: 'change profile picture', use: 'util
             return 0;
         }
     }catch(e){
-        const util = require("util");
-        return await m.send(util.format(e))
+        return await m.send("Profile pic not found")
     }
 })
 Module({ pattern: 'update ?(.*)', fromMe: true, desc: 'change profile picture', use: 'utility' }, async (m,match) => {
