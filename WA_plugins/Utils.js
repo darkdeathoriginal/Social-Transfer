@@ -20,9 +20,22 @@ Module({ pattern: 'jid', fromMe: true, desc: 'To get Group jids', use: 'utility'
     await m.client.sendMessage(m.jid,{text:m.jid})
 })
 Module({ pattern: 'pp', fromMe: true, desc: 'change profile picture', use: 'utility' }, async (m,match) => {
-    
-    await m.client.updateProfilePicture(m.client.user.id,await m.quoted.download())
-    return await m.send("Profile updated..")
+    try{
+        if(m.quoted?.mtype == "imageMessage"){
+            await m.client.updateProfilePicture(m.client.user.id,await m.quoted.download())
+            return await m.send("Profile updated..")
+        }
+        else if(m.quoted){
+            let a = await m.client.profilePictureUrl(m.quoted.sender, 'image')
+            return await m.client.sendMessage(m.jid,{image:{url:a}})
+        }
+        else{
+            return 0;
+        }
+    }catch(e){
+        const util = require("util");
+        return await m.send(util.format(e))
+    }
 })
 Module({ pattern: 'update ?(.*)', fromMe: true, desc: 'change profile picture', use: 'utility' }, async (m,match) => {
     
