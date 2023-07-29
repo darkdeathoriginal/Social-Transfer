@@ -1,4 +1,6 @@
 const { Module } = require('../WA_index');
+const simpleGit = require('simple-git');
+const git = simpleGit();
 
 Module({ pattern: 'getjids', fromMe: true, desc: 'To get Group jids', use: 'utility' }, async (m,match) => {
     
@@ -16,4 +18,36 @@ Module({ pattern: 'getjids', fromMe: true, desc: 'To get Group jids', use: 'util
 Module({ pattern: 'jid', fromMe: true, desc: 'To get Group jids', use: 'utility' }, async (m,match) => {
     
     await m.client.sendMessage(m.jid,{text:m.jid})
+})
+Module({ pattern: 'pp', fromMe: true, desc: 'change profile picture', use: 'utility' }, async (m,match) => {
+    
+    await m.client.updateProfilePicture(m.client.user.id,await m.quoted.download())
+    return await m.send("Profile updated..")
+})
+Module({ pattern: 'update ?(.*)', fromMe: true, desc: 'change profile picture', use: 'utility' }, async (m,match) => {
+    
+    var commits = await git.log(['main' + '..origin/' + 'main']);
+        var mss = '';
+        if (commits.total === 0) {
+            mss = "**Bot up to date!**"
+            return await m.send(mss);
+            
+        }
+
+        else if(match[1] == "start"){
+            await require("simple-git")().reset("hard",["HEAD"])
+            await require("simple-git")().pull()
+            await m.send("Successfully updated. Please manually update npm modules if applicable!")
+            process.exit(0); 
+        }
+        
+        else {
+            var changelog = "Pending updates:\n\n";
+            for (var i in commits.all){
+            changelog += `${(parseInt(i)+1)}• **${commits.all[i].message}**\n`
+            }
+        }
+
+        changelog+=`\nUse ".update start" to start the update`
+        m.send(changelog)
 })
