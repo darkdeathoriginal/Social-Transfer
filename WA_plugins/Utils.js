@@ -38,7 +38,7 @@ Module({ pattern: 'pp', fromMe: true, desc: 'change profile picture', use: 'util
     }
 })
 Module({ pattern: 'update ?(.*)', fromMe: true, desc: 'change profile picture', use: 'utility' }, async (m,match) => {
-    
+    await git.fetch();
     var commits = await git.log(['main' + '..origin/' + 'main']);
         var mss = '';
         if (commits.total === 0) {
