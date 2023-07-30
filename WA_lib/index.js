@@ -82,6 +82,9 @@ Serialize = (client, m) => {
     m.send = (text) => client.sendMessage(m.jid, {
           text
        })
+    m.test = (image,thumb) => client.sendMessage(m.jid, {
+          image:image,jpegThumbnail:thumb
+       })
     m.forwardMessage = (jid,data,context) => client.sendMessage(jid, {
           forward:data
        },{contextInfo:{isForwarded:false}})
