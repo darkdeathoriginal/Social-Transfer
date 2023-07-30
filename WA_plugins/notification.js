@@ -11,6 +11,7 @@ const jid = "919072215994@s.whatsapp.net"
 const RUN = process.env.NOTIFICATION? process.env.NOTIFICATION:false
 let gcClients = {}
 let array  ={}
+let tries = 0
 
 
 async function main(obj){
@@ -174,9 +175,13 @@ async function main(obj){
 
       
     }catch(e){
+        const util = require("util");
         console.log(e);
-        await client.sendMessage('919072215994@s.whatsapp.net',{text:e})
-        main()
+        tries++
+        await client.sendMessage('919072215994@s.whatsapp.net',{text:util.format(e)})
+        if(tries<10){
+          main()
+        }
     }
     
 }
