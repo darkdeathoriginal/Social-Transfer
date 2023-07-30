@@ -180,7 +180,7 @@ async function main(obj){
         tries++
         await client.sendMessage('919072215994@s.whatsapp.net',{text:util.format(e)})
         if(tries<10){
-          main()
+          main(obj)
         }
     }
     
