@@ -7,6 +7,7 @@ const pino = require('pino')
 const modules = [];
 const util = require("util");
 const {Serialize} = require("./WA_lib/index")
+const {welcomeDb, addwelcome ,updatewelcome,deletewelcome} = require("./WA_plugins/sql/welcome")
 const JIDS = ['919072215994@s.whatsapp.net','14404448898:22@s.whatsapp.net','']
 
 class AddCmd {
@@ -198,6 +199,31 @@ const store = makeInMemoryStore({
         }
      })
      client.ev.on('creds.update', saveCreds)
+     client.ev.on('group-participants.update', async groupUpdate =>{
+         await welcomeDb.sync()
+         const data = await welcomeDb.findAll()
+         const jid = groupUpdate.id
+         let tt = data.find(c => c.name === jid);
+         console.log(groupUpdate)
+         try{
+            if(tt && groupUpdate.action == "add"){
+               let text = tt.data
+               const {subject,desc} = await client.groupMetadata(groupUpdate.id)
+               const participant = groupUpdate.participants[0]
+               const picture = await client.profilePictureUrl(participant, 'image').catch(e=>console.log(e))
+               text =text.replace("{user}",`@${participant.split("@")[0]}`).replace("{subject}",`${subject}`).replace("\\n",`\n`)
+               if(text.match("{pp}")&&picture){
+                  text = text.replace("{pp}",``)
+                  await client.sendMessage(groupUpdate.id,{image :{url:picture} ,caption: text,mentions:[participant]})
+               }
+               else{
+                  await client.sendMessage(groupUpdate.id,{text: text,mentions:[participant]})
+               }
+            }
+         }catch(e){
+            console.log(e);
+         }
+     })
      client.ev.on('messages.upsert', async chatUpdate => {
         try {
            m = chatUpdate.messages[0]
