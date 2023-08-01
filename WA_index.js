@@ -204,14 +204,13 @@ const store = makeInMemoryStore({
          const data = await welcomeDb.findAll()
          const jid = groupUpdate.id
          let tt = data.find(c => c.name === jid);
-         console.log(groupUpdate)
          try{
             if(tt && groupUpdate.action == "add"){
                let text = tt.data
                const {subject,desc} = await client.groupMetadata(groupUpdate.id)
                const participant = groupUpdate.participants[0]
                const picture = await client.profilePictureUrl(participant, 'image').catch(e=>console.log(e))
-               text =text.replace("{user}",`@${participant.split("@")[0]}`).replace("{subject}",`${subject}`).replace("\\n",`\n`)
+               text =text.replace("{user}",`@${participant.split("@")[0]}`).replace("{subject}",`${subject}`).replace("{desc}",`${desc}`).replace("\\n",`\n`)
                if(text.match("{pp}")&&picture){
                   text = text.replace("{pp}",``)
                   await client.sendMessage(groupUpdate.id,{image :{url:picture} ,caption: text,mentions:[participant]})
