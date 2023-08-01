@@ -210,7 +210,7 @@ const store = makeInMemoryStore({
                const {subject,desc} = await client.groupMetadata(groupUpdate.id)
                const participant = groupUpdate.participants[0]
                const picture = await client.profilePictureUrl(participant, 'image').catch(e=>console.log(e))
-               text =text.replace("{user}",`@${participant.split("@")[0]}`).replace("{subject}",`${subject}`).replace("{desc}",`${desc}`).replace("\\n",`\n`)
+               text =text.replace("{user}",`@${participant.split("@")[0]}`).replace("{subject}",`${subject}`).replace("{desc}",`${desc}`).replaceAll("\\n",`\n`)
                if(text.match("{pp}")&&picture){
                   text = text.replace("{pp}",``)
                   await client.sendMessage(groupUpdate.id,{image :{url:picture} ,caption: text,mentions:[participant]})
