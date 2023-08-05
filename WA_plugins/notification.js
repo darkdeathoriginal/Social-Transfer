@@ -245,13 +245,10 @@ async function listCourseWorkMaterials(COURSEID,gcClient) {
 
   return allCourseWork
 }
-async function getCources() {
-
-  const classroom = google.classroom({ version: 'v1', auth: gcClient });
-
+async function getCourses(client) {
+  const classroom = google.classroom({ version: 'v1', auth: client });
   const { data: { courses } } = await classroom.courses.list();
-
-  return courses
+  return courses;
 }
 async function getTeachers(COURSEID,gcClient) {
 
@@ -301,4 +298,4 @@ Module(
   }
 );
 
-module.exports = {getFile,listAnnouncements,listCourseWorkMaterials,listCourseWork,gcClients}
+module.exports = {getFile,listAnnouncements,listCourseWorkMaterials,listCourseWork,gcClients,getCourses}
