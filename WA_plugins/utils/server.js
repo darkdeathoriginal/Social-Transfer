@@ -4,9 +4,9 @@ const fs = require('fs');
 const app = express();
 const port = 5001; 
 
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/cert.pem', 'utf8');
-const ca = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/chain.pem', 'utf8'); // Optional: Chain certificate
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/darkbot.eastasia.cloudapp.azure.com/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/darkbot.eastasia.cloudapp.azure.com/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/darkbot.eastasia.cloudapp.azure.com/chain.pem', 'utf8'); // Optional: Chain certificate
 
 const credentials = {
   key: privateKey,
