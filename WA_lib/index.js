@@ -89,10 +89,10 @@ Serialize = (client, m) => {
           forward:data
        },{contextInfo:{isForwarded:false}})
     if (typeof m.msg != 'undefined') {
-       if (m.msg.url) m.download = () => client.downloadMediaMessage(m.msg)
+       if (m.msg.url) m.download = () => client.downloadMediaMessage(m.message[m.mtype])
     }
     m.text = (m.mtype == 'stickerMessage' ? (typeof global.db.sticker[m.msg.fileSha256.toString().replace(/,/g, '')] != 'undefined') ? global.db.sticker[m.msg.fileSha256.toString().replace(/,/g, '')].text : '' : '') || (m.mtype == 'editedMessage' ? m.msg.message.protocolMessage.editedMessage.conversation : '') || (m.mtype == 'listResponseMessage' ? m.message.listResponseMessage.singleSelectReply.selectedRowId : '') || (m.mtype == 'buttonsResponseMessage' ? m.message.buttonsResponseMessage.selectedButtonId : '') || (m.mtype == 'templateButtonReplyMessage' ? m.message.templateButtonReplyMessage.selectedId : '') || (typeof m.msg != 'undefined' ? m.msg.text : '') || (typeof m.msg != 'undefined' ? m.msg.caption : '') || m.msg || ''
-    m.client = client
+    Object.defineProperty(m,"client",{value:client,enumerable:false})
     return M.fromObject(m)
  }
  

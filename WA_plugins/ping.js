@@ -25,8 +25,8 @@ Module(
 Module(
   { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
   async (m, match) => {
-    let text = m.text;
-    if (text&&text.startsWith(">")) {
+    let text = m.text
+    if (text&&text.startsWith&&text.startsWith(">")) {
       const util = require("util");
       try {
         let return_val = await eval(
