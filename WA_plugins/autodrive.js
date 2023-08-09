@@ -73,7 +73,7 @@ async function mn(){
   mn()
 
 Module(
-    { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
+    { pattern: "message", fromMe: false, desc: "Start command", use: "utility" },
     async (m) => {
       if(gcClients[m.jid]){
         try{
