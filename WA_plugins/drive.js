@@ -2,8 +2,7 @@ const { Module } = require('../WA_index');
 const { google } = require('googleapis');
 const fs = require('fs');
 const { DriveDb, addDrive, updateDrive, deleteDrive } = require("./sql/drive");
-const { fromBuffer } = require('file-type');
-const {getCode} = require("./utils/server")
+const {getCode,closeServer} = require("./utils/server")
 
 const credsPath = "./creds.json";
 const SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -78,6 +77,7 @@ Module({ pattern: 'drive ?(.*)', fromMe: false, desc: 'notification setup comman
   
   states.name.handle =async (m)=> {
     name = m.jid
+    await closeServer()
     let creds = require("../creds.json")
     const { client_id, client_secret, redirect_uris } = creds.web
     client = new google.auth.OAuth2(client_id, client_secret, redirect_uris);

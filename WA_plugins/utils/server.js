@@ -40,6 +40,8 @@ async function getCode(){
           
     })
 }
-
-module.exports = {getCode}
+async function closeServer(){
+  return await server.close();
+}
+module.exports = {getCode,closeServer}
 
