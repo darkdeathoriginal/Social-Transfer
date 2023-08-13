@@ -9,26 +9,13 @@ const SCOPES = ['https://www.googleapis.com/auth/drive']
 
 let state = null;
 let jid = null;
-let DATA = null;
 let name = null;
 let client = null;
-let forward = null;
-let cources = null;
 let FILEID = null;
 
 const states = {
   creds: {state: 'creds'},
-  options: {state: 'options'},
-  menu: {state: 'menu'},
-  name: {state: 'name'},
-  jid: {state: 'jid'},
-  query: {state: 'query'},
-  delete: {state: 'delete'},
-  newjid: {state: 'newjid'},
-  clist: {state: 'clist'},
-  ccources: {state: 'ccources'},
-  dtype: {state: 'dtype'},
-  download: {state: 'download'}
+  name: {state: 'name'}
 };
 
 Module({ pattern: 'drive ?(.*)', fromMe: false, desc: 'notification setup command', use: 'utility' }, async (m, match) => {
@@ -53,28 +40,7 @@ Module({ pattern: 'drive ?(.*)', fromMe: false, desc: 'notification setup comman
     }
   }
 });
-
-  states.creds.handle =async (m)=> {
-    let creds = JSON.parse(m.text);
-    await fs.writeFileSync(credsPath, JSON.stringify(creds), { encoding: 'utf8' });
-    state = null;
-    return await m.send(`Successfully set credentials.`);
-  }
-  
-  states.menu.handle = async (m)=> {
-    var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false;
-    if (!no) throw "_Reply must be a number_";
-    if (no == '1') {
-      state = states.name.state;
-      return await states.name.handle(m)
-    } else if (no == '2') {
-      return await handleMenu(m,states.delete.state)
-    } else {
-      state = null;
-      await m.send("Invalid option");
-    }
-  }
-  
+    
   states.name.handle =async (m)=> {
     name = m.jid
     await closeServer()
