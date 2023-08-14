@@ -15,6 +15,7 @@ app.post('/', async(req, res) => {
     const body = req.body
     let user = body.pusher.name
     let msg = `${user} has performed a push request in ${body.repository.name}\n`
+    msg+='\nCommits :'
     let n=1;
     for(let i of body.commits){
         msg+=`\n${n}• *${i.message?i.message:""}*`
