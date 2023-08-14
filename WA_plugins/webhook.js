@@ -17,7 +17,8 @@ app.post('/', async(req, res) => {
     let msg = `${user} has performed a push request in ${body.repository.name}\n`
     let n=1;
     for(let i of body.commits){
-        msg+=`\n${n}• *${i.message?i.message:""}`
+        msg+=`\n${n}• *${i.message?i.message:""}*`
+        n++
     }
     await client.sendMessage("919072215994@s.whatsapp.net",{text:msg})
 });
