@@ -21,7 +21,7 @@ app.post('/', async(req, res) => {
         msg+=`\n${n}• *${i.message?i.message:""}*`
         n++
     }
-    await client.sendMessage("919072215994@s.whatsapp.net",{text:msg})
+    await client.sendMessage("120363166357739091@g.us",{text:msg})
 });
 // Start the server
 server = app.listen(port, () => {
