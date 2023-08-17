@@ -296,7 +296,7 @@ states.download.handle =async (m)=> {
   if (!no) throw "_Reply must be  a number_";
   if(no == '0'){
     for(let i of Object.values(DATA)){
-      await handleDl(m,i)
+      handleDl(m,i)
     }
   }
   else if(DATA[no]){
