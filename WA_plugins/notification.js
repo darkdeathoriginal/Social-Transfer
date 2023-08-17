@@ -281,11 +281,18 @@ Module(
       var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
       if (!no) throw "_Reply must be  a number_";
       let data = array[m.quoted.id]
-      if(data[no]){
+      if(no == '0'){
+        for(let i of Object.values(data)){
+          const {id,title,name} = i
+          let buffer = await getFile(id,gcClients[name])
+          let {mime} = await fromBuffer(buffer)
+          await m.client.sendMessage(m.jid,{document:buffer,fileName:title,mimetype:mime})
+        }
+      }
+      else if(data[no]){
         const {id,title,name} = data[no]
         let buffer = await getFile(id,gcClients[name])
         let {mime} = await fromBuffer(buffer)
-        this.state = false
         return await m.client.sendMessage(m.jid,{document:buffer,fileName:title,mimetype:mime})
       }
       else{
