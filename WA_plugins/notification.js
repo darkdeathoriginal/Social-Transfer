@@ -3,7 +3,7 @@ require('dotenv').config();
 const {google} = require('googleapis');
 const fs = require('fs')
 const {ClassDb,updateClass} = require("./sql/classroom")
-const { Module } = require('../WA_index');
+const { onMessage} = require('../WA_index');
 const { fromBuffer } = require('file-type')
 
 const credsPath = "./creds.json"
@@ -274,7 +274,7 @@ async function getFile(fileId,gcClient){
   }
 }
 
-Module(
+onMessage(
   { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
   async (m, match) => {
     if(array[m.quoted?.id]){

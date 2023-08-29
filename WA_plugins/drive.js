@@ -18,7 +18,7 @@ const states = {
   name: {state: 'name'}
 };
 
-Module({ pattern: 'drive ?(.*)', fromMe: false, desc: 'notification setup command', use: 'utility' }, async (m, match) => {
+Module({ pattern: 'drive', fromMe: false, desc: 'notification setup command', use: 'utility' }, async (m, match) => {
   if (!fs.existsSync(credsPath)) {
     state = states.creds.state;
     jid = m.jid;

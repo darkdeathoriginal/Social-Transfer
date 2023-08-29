@@ -1,106 +1,26 @@
-const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('@adiwajshing/baileys')
+const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore  } = require('@adiwajshing/baileys')
 global.component = new (require('@neoxr/neoxr-js'))
 const { Extra} = component
 const { Socket } = Extra
 const fs = require('fs');
 const pino = require('pino')
-const modules = [];
-const util = require("util");
+const modules = {};
+const onMessages = []
 const {Serialize} = require("./WA_lib/index")
-const {welcomeDb, addwelcome ,updatewelcome,deletewelcome} = require("./WA_plugins/sql/welcome")
+const {welcomeDb} = require("./WA_plugins/sql/welcome")
 const JIDS = ['919072215994@s.whatsapp.net','14404448898:22@s.whatsapp.net','']
+const handlers = ['.'];
 
-class AddCmd {
-    constructor({ pattern, fromMe, desc, use }, callback) {
-      this.pattern = pattern;
-      this.fromMe = fromMe;
-      this.desc = desc;
-      this.use = use;
-      this.callback = callback;
-    }
-  
-    async handleEvent(m, client) {
-      let j = m.sender?m.sender:m.jid
-      if(this.fromMe&&!JIDS.includes(j))return
-      const text = m.text//m.message?.conversation ||m.message?.extendedTextMessage?.text ||false
-      // if (m.message) {
-      //    if (m.message.viewOnceMessage) {
-      //       m.mtype = Object.keys(m.message.viewOnceMessage.message)[0]
-      //       m.msg = m.message.viewOnceMessage.message[m.mtype]
-      //    } else if (m.message.viewOnceMessageV2) {
-      //       m.mtype = Object.keys(m.message.viewOnceMessageV2.message)[0]
-      //       m.msg = m.message.viewOnceMessageV2.message[m.mtype]
-      //    } else {
-      //       m.mtype = Object.keys(m.message)[0] == 'senderKeyDistributionMessage' ? Object.keys(m.message)[2] == 'messageContextInfo' ? Object.keys(m.message)[1] : Object.keys(m.message)[2] : Object.keys(m.message)[0] != 'messageContextInfo' ? Object.keys(m.message)[0] : Object.keys(m.message)[1]
-      //       m.msg = m.message[m.mtype]
-      //    }
-      // }
-      // let newMessage = {}
-      // newMessage.jid = m.key.remoteJid
-      // newMessage.message =  m.message?.conversation||m.message?.extendedTextMessage?.text || false
-      // newMessage.data = m
-      // newMessage.quoted = m.msg.contextInfo ? m.msg.contextInfo.quotedMessage : null 
-      // if (newMessage.quoted) {
-      //    let type = Object.keys(newMessage.quoted)[0]
-      //    newMessage.quoted = newMessage.quoted[type]
-      //    if (['productMessage'].includes(type)) {
-      //       type = Object.keys(newMessage.quoted)[0]
-      //       newMessage.quoted = newMessage.quoted[type]
-      //    }
-      //    if (['documentWithCaptionMessage'].includes(type)) {
-      //      type = Object.keys(newMessage.quoted)[0]
-      //      newMessage.quoted = newMessage.quoted.message[type]
-      //    }
-      //    if (typeof newMessage.quoted === 'string') newMessage.quoted = {
-      //       text: newMessage.quoted
-      //    }
-      //    newMessage.quoted.id = m.msg.contextInfo.stanzaId
-      //    newMessage.quoted.chat = m.msg.contextInfo.remoteJid || m.chat
-      //    newMessage.quoted.sender = m.msg.contextInfo.participant.split(":")[0] || m.msg.contextInfo.participant
-      //    newMessage.quoted.fromMe = newMessage.quoted.sender === (client.user && client.user.id)
-      //    newMessage.quoted.mentionedJid = m.msg.contextInfo ? m.msg.contextInfo.mentionedJid : []
-      //    newMessage.quoted.download = () => client.downloadMediaMessage(newMessage.quoted)
-      // }
-   
-      // newMessage.client = client
-      // newMessage.forwardMessage = async(jid,data,context)=>{
-      //    return await client.sendMessage(jid,{forward:data},context)
-      // }
-      // newMessage.send = async(text)=>{
-      //    return await client.sendMessage(newMessage.jid,{text:text})
-      // }
-      
-  
-      if (this.pattern === "message") {
-        return await this.callback(m);
-      } else {
-        const regex = new RegExp(`^\\.${this.pattern}`,'i');
-        if (typeof(text) === 'string') {
-            const match = text.match(regex);
 
-        
-        if (match) {
-          try{
-            
-          return await this.callback(m,match);
-          }catch(e){
-            client.sendMessage(m.jid,{text:util.format(e)})
-          }
-        }}
-      }
-    }
-  }
+function Module(obj, callback) {
+   obj.callback = callback
+   modules[obj.pattern] = obj;
+}
+function onMessage(obj, callback) {
+   obj.callback = callback
+   onMessages.push(obj)
+}
 
-  function Module(moduleConfig, callback) {
-    const { pattern, fromMe, desc, use } = moduleConfig;
-    const module = new AddCmd({ pattern, fromMe, desc, use }, callback);
-    modules.push(module);
-  }
-Module({ pattern: 'start', fromMe: true, desc: 'Start command', use: 'utility' }, async (m) => {
-await m.client.sendMessage(m.jid, {
-    text: `Hi, your ID is ${m.jid}`,
-});
-});
 const store = makeInMemoryStore({
     logger: pino().child({
        level: 'silent',
@@ -141,7 +61,7 @@ const store = makeInMemoryStore({
            }
            return message
         },
-        browser: ['@neoxr / neoxr-bot', 'safari', '1.0.0'],
+        browser: ['@dark / dark-bot', 'safari', '1.0.0'],
         auth: state,
         getMessage: async (key) => {
            if (store) {
@@ -170,24 +90,26 @@ const store = makeInMemoryStore({
         if (connection === 'connecting') {
          console.log('connecting');
        } else if (connection === 'open') {
-         module.exports = {
-            Module,
-            modules,
-            client
-         
-          };
-          const pluginFolder = "./WA_plugins/";
-  const files = fs.readdirSync(pluginFolder);
+			module.exports = {
+			Module,
+			onMessage,
+			modules,
+			client
+			};
+			const pluginFolder = "./WA_plugins/";
+			const files = fs.readdirSync(pluginFolder);
 
-  files.forEach((file) => {
-    if (file.endsWith('.js')) {
-      const filePath = pluginFolder+file;
-      require(filePath);
-    }
-  });
-         client.sendMessage("919072215994@s.whatsapp.net",{text:"bot started"})
-           console.log(`Connected, you login as ${client.user.name || client.user.verifiedName}`);
-           require("./TG_index")
+			files.forEach((file) => {
+				if (file.endsWith('.js')) {
+				const filePath = pluginFolder+file;
+				require(filePath);
+				}
+			});
+
+			client.sendMessage("919072215994@s.whatsapp.net",{text:"bot started"})
+			console.log(`Connected, you login as ${client.user.name || client.user.verifiedName}`);
+
+			require("./TG_index")
         } else if (connection === 'close') {
            if (lastDisconnect.error.output.statusCode == DisconnectReason.loggedOut) {
               console.log( `Can't connect to Web Socket`);
@@ -230,11 +152,25 @@ const store = makeInMemoryStore({
            if (!m.message||m.key.id.startsWith("BAE")) return
            client.readMessages([m.key])
            Serialize(client,m)
-           for (const module of modules) {
-            await module.handleEvent(m, client);
-          }
+           const regexPattern = `^[${handlers.map(handler => `\\${handler}`).join('')}]([a-zA-Z]+)(?:\\s+(.+))?`;
+           const text = m.text
+            const regex = new RegExp(regexPattern);
+            const match = text.match(regex);
+            if (match) {
+				match.shift()
+				let command = modules[match[0]]
+				console.log(command);
+				if(command && (!command.fromMe || JIDS.includes(m.key.remoteJid))){
+					command.callback(m,match)
+				}
+            }
+			for(let i of onMessages){
+				if(!i.fromMe || JIDS.includes(m.key.remoteJid)){
+					i.callback(m,match)
+				}
+			}
         } catch (e) {
-           throw(e)
+           console.log(e);
         }
      })
 

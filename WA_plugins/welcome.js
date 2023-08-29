@@ -1,8 +1,8 @@
 const {welcomeDb, addwelcome ,updatewelcome,deletewelcome} = require("./sql/welcome")
-const { Module } = require('../WA_index');
+const { Module,onMessage } = require('../WA_index');
 const { name } = require("./classroom-notification");
 
-Module({ pattern: 'welcome ?(.*)', fromMe: true, desc: 'Welcome message setter', use: 'utility' }, async (m,match) => {
+Module({ pattern: 'welcome', fromMe: true, desc: 'Welcome message setter', use: 'utility' }, async (m,match) => {
     if(!match[1]) return await m.send("Give me a welcome message")
     this.text = match[1]
     if(match[1]=="del"){
@@ -42,7 +42,7 @@ Module({ pattern: 'welcome ?(.*)', fromMe: true, desc: 'Welcome message setter',
     }
 })
 
-Module({ pattern: 'message', fromMe: false, desc: 'Ping command', use: 'utility' }, async (m,match) => {
+onMessage({ pattern: 'message', fromMe: false, desc: 'welcome message setter', use: 'utility' }, async (m,match) => {
     if(m.quoted?.id == this.id && this.state && !m.text.match("welcome")){
         await welcomeDb.sync()
         if(m.text == "stop"){

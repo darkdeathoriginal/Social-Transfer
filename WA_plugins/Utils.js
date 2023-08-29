@@ -36,7 +36,7 @@ Module({ pattern: 'pp', fromMe: true, desc: 'change profile picture', use: 'util
         return await m.send("Profile pic not found")
     }
 })
-Module({ pattern: 'update ?(.*)', fromMe: true, desc: 'change profile picture', use: 'utility' }, async (m,match) => {
+Module({ pattern: 'update', fromMe: true, desc: 'change profile picture', use: 'utility' }, async (m,match) => {
     await git.fetch();
     var commits = await git.log(['main' + '..origin/' + 'main']);
         var mss = '';

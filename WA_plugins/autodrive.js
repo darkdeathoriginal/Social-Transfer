@@ -2,9 +2,8 @@ const { client } = require("../WA_index");
 require('dotenv').config();
 const {google} = require('googleapis');
 const fs = require('fs')
-const {DriveDb,updateDrive} = require("./sql/drive")
-const { Module } = require('../WA_index');
-const { fromBuffer } = require('file-type')
+const {DriveDb} = require("./sql/drive")
+const { onMessage } = require('../WA_index');
 const { Readable } = require('stream');
 
 const credsPath = "./creds.json"
@@ -72,7 +71,7 @@ async function mn(){
   }
   mn()
 
-Module(
+  onMessage(
     { pattern: "message", fromMe: false, desc: "Start command", use: "utility" },
     async (m) => {
       if(gcClients[m.jid]){

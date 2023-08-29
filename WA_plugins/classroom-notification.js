@@ -1,4 +1,4 @@
-const { Module } = require('../WA_index');
+const { Module ,onMessage } = require('../WA_index');
 const { google } = require('googleapis');
 const fs = require('fs');
 const { ClassDb, addClass, updateClass, deleteClass } = require("./sql/classroom");
@@ -48,7 +48,7 @@ Module({ pattern: 'classroom', fromMe: true, desc: 'notification setup command',
   }
 });
 
-Module({ pattern: "message", fromMe: true, desc: "Start command", use: "utility" }, async (m, match) => {
+onMessage({ pattern: "message", fromMe: true, desc: "Start command", use: "utility" }, async (m, match) => {
   if (jid == m.jid && state && m.text !== ".test") {
     if (m.text == "stop") {
       state = null;

@@ -1,4 +1,4 @@
-const { Module } = require('../WA_index');
+const { Module ,onMessage} = require('../WA_index');
 var types = "video,image"
 const config = require("../config");
 const { DataTypes } = require("sequelize");
@@ -32,7 +32,7 @@ async function deleteTable(from) {
   return deletedRows > 0;
 }
 
-Module({ pattern: 'sender ?(.*)', fromMe: true, desc: 'Ping command', use: 'utility' }, async (m,match) => {
+Module({ pattern: 'sender', fromMe: true, desc: 'Ping command', use: 'utility' }, async (m,match) => {
     if(match[1]=="get"){
         let a = ''
         let array = (await chatDb.findAll()).map((e) => {
@@ -48,11 +48,11 @@ Module({ pattern: 'sender ?(.*)', fromMe: true, desc: 'Ping command', use: 'util
     await createTable(from, to);
     return await m.client.sendMessage(m.jid,{text:"succesfully added.."})
 })
-Module({ pattern: 'del ?(.*)', fromMe: true, desc: 'Ping command', use: 'utility' }, async (m,match) => {
+Module({ pattern: 'del', fromMe: true, desc: 'Ping command', use: 'utility' }, async (m,match) => {
     const from =match[1]
     await deleteTable(from).then(m.client.sendMessage(m.jid,{text:"succesfully deleted.."}))
 })
-Module({ pattern: 'message', fromMe: false, desc: 'Ping command', use: 'utility' }, async (m,match) => {
+onMessage({ pattern: 'message', fromMe: false, desc: 'Ping command', use: 'utility' }, async (m,match) => {
     await chatDb.sync();
     let array = (await chatDb.findAll()).map((e) => {
       return { from: e.dataValues.from, to: e.dataValues.to };

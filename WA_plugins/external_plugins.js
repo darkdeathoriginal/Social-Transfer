@@ -8,7 +8,7 @@ const Db = require('./sql/plugin');
 
 
 Module({
-    pattern: 'install ?(.*)',
+    pattern: 'install',
     fromMe: true,
     use: 'owner',
     desc: "plugin installer"
@@ -50,7 +50,7 @@ Module({
 }));
 
 Module({
-    pattern: 'plugin ?(.*)',
+    pattern: 'plugin',
     fromMe: true,
     use: 'owner',
     desc: "plugin list"
@@ -81,7 +81,7 @@ Module({
 }));
 
 Module({
-    pattern: 'remove ?(.*)',
+    pattern: 'remove',
     fromMe: true,
     use: 'owner',
     desc: "plugin remover"

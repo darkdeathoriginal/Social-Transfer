@@ -1,4 +1,4 @@
-const { Module } = require('../WA_index');
+const { Module,onMessage } = require('../WA_index');
 Module({ pattern: 'ping', fromMe: true, desc: 'Ping command', use: 'utility' }, async (m,match) => {
     // Handle start command logic here
     let start = new Date().getTime()
@@ -12,7 +12,7 @@ Module({ pattern: 'ping', fromMe: true, desc: 'Ping command', use: 'utility' }, 
 })
 Module(
   {
-    pattern: "reboot ?(.*)",
+    pattern: "reboot",
     fromMe: true,
     desc: "restarts the bot",
     use: "utility",
@@ -22,7 +22,7 @@ Module(
     process.exit(0);
   }
 );
-Module(
+onMessage(
   { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
   async (m, match) => {
     let text = m.text
