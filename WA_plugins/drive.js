@@ -68,7 +68,6 @@ Module({ pattern: 'drive', fromMe: false, desc: 'notification setup command', us
 
   await fs.writeFileSync(path, JSON.stringify(tokens), { encoding: 'utf8' });
   client.setCredentials(tokens);
-  state = states.options.state;
   await m.send("Successfully set account");
   FILEID = await createFolder()
   let data = {
