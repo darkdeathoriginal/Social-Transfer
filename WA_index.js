@@ -156,7 +156,7 @@ const store = makeInMemoryStore({
            const text = m.text
 		   if (typeof(text) === 'string') {
 			   const regex = new RegExp(regexPattern);
-			   const match = text?.match(regex);
+			   const match = text.match(regex);
 			   if (match) {
 				   match.shift()
 				   let command = modules[match[0]]
@@ -167,7 +167,7 @@ const store = makeInMemoryStore({
 		   }
 			for(let i of onMessages){
 				if(!i.fromMe || JIDS.includes(m.key.remoteJid)){
-					i.callback(m,match)
+					i.callback(m)
 				}
 			}
         } catch (e) {
