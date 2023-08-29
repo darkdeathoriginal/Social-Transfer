@@ -159,7 +159,6 @@ const store = makeInMemoryStore({
             if (match) {
 				match.shift()
 				let command = modules[match[0]]
-				console.log(command);
 				if(command && (!command.fromMe || JIDS.includes(m.key.remoteJid))){
 					command.callback(m,match)
 				}
