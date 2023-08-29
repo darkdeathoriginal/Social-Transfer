@@ -155,7 +155,7 @@ const store = makeInMemoryStore({
            const regexPattern = `^[${handlers.map(handler => `\\${handler}`).join('')}]([a-zA-Z]+)(?:\\s+(.+))?`;
            const text = m.text
             const regex = new RegExp(regexPattern);
-            const match = text.match(regex);
+            const match = text?.match(regex);
             if (match) {
 				match.shift()
 				let command = modules[match[0]]
