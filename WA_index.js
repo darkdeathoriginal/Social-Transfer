@@ -152,15 +152,18 @@ const store = makeInMemoryStore({
            if (!m.message||m.key.id.startsWith("BAE")) return
            client.readMessages([m.key])
            Serialize(client,m)
+           
            const regexPattern = `^[${handlers.map(handler => `\\${handler}`).join('')}]([a-zA-Z]+)(?:\\s+(.+))?`;
            const text = m.text
 		   if (typeof(text) === 'string') {
+            
 			   const regex = new RegExp(regexPattern);
 			   const match = text.match(regex);
 			   if (match) {
-				   match.shift()
+               match.shift()
 				   let command = modules[match[0]]
-				   if(command && (!command.fromMe || JIDS.includes(m.key.remoteJid))){
+               let jid = m.key.participant?m.key.participant:m.key.remoteJid
+				   if(command && (!command.fromMe || JIDS.includes(jid))){
 					   command.callback(m,match)
 				   }
 			   }
