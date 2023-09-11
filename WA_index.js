@@ -155,6 +155,7 @@ const store = makeInMemoryStore({
            
            const regexPattern = `^[${handlers.map(handler => `\\${handler}`).join('')}]([a-zA-Z]+)(?:\\s+(.+))?`;
            const text = m.text
+           let jid = m.key.participant?m.key.participant:m.key.remoteJid
 		   if (typeof(text) === 'string') {
             
 			   const regex = new RegExp(regexPattern);
@@ -162,14 +163,14 @@ const store = makeInMemoryStore({
 			   if (match) {
                match.shift()
 				   let command = modules[match[0]]
-               let jid = m.key.participant?m.key.participant:m.key.remoteJid
+               
 				   if(command && (!command.fromMe || JIDS.includes(jid))){
 					   command.callback(m,match)
 				   }
 			   }
 		   }
 			for(let i of onMessages){
-				if(!i.fromMe || JIDS.includes(m.key.remoteJid)){
+				if(!i.fromMe || JIDS.includes(jid)){
 					i.callback(m)
 				}
 			}
