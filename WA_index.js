@@ -110,6 +110,7 @@ const store = makeInMemoryStore({
 			console.log(`Connected, you login as ${client.user.name || client.user.verifiedName}`);
 
 			require("./TG_index")
+         require("./server/server")
         } else if (connection === 'close') {
            if (lastDisconnect.error.output.statusCode == DisconnectReason.loggedOut) {
               console.log( `Can't connect to Web Socket`);
