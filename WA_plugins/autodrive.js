@@ -76,9 +76,8 @@ async function mn(){
     async (m) => {
       if(gcClients[m.jid]){
         try{
-
             let ob = (await DriveDb.findAll()).find(c => c.name === m.jid);
-            if(m.mtype == "imageMessage"){
+            if(m.data.message.imageMessage){
                 const indianDate = new Date().toLocaleString('en-US', { timeZone: indianTimeZone });
                 let data = {
                     name:`${indianDate}.jpg`,
@@ -87,9 +86,9 @@ async function mn(){
                     fileid:ob.data.FileId
                 }
                 await upload(gcClients[m.jid],data)
-                return await m.client.sendMessage(m.jid,{text:"file uploaded"},{quoted:m})
+                return await m.client.sendMessage(m.jid,{text:"file uploaded"},{quoted:m.data})
             }
-            else if(m.mtype == "videoMessage"){
+            else if(m.data.message.videoMessage){
                 const indianDate = new Date().toLocaleString('en-US', { timeZone: indianTimeZone });
                 let data = {
                     name:`${indianDate}.mp4`,
@@ -98,9 +97,9 @@ async function mn(){
                     fileid:ob.data.FileId
                 }
                 await upload(gcClients[m.jid],data)
-                return await m.client.sendMessage(m.jid,{text:"file uploaded"},{quoted:m})
+                return await m.client.sendMessage(m.jid,{text:"file uploaded"},{quoted:m.data})
             }
-            else if(m.mtype == "audioMessage"){
+            else if(m.data.message.audioMessage){
                 const indianDate = new Date().toLocaleString('en-US', { timeZone: indianTimeZone });
                 let data = {
                     name:`${indianDate}.mp3`,
@@ -109,18 +108,18 @@ async function mn(){
                     fileid:ob.data.FileId
                 }
                 await upload(gcClients[m.jid],data)
-                return await m.client.sendMessage(m.jid,{text:"file uploaded"},{quoted:m})
+                return await m.client.sendMessage(m.jid,{text:"file uploaded"},{quoted:m.data})
             }
-            else if(m.mtype == "documentMessage"){
+            else if(m.data.message.documentMessage){
                 const indianDate = new Date().toLocaleString('en-US', { timeZone: indianTimeZone });
                 let data = {
-                    name:m.message.documentMessage.fileName,
-                    buffer: await download(m),
-                    mime: m.message.mimetype,
+                    name:m.data.message.documentMessage.fileName,
+                    buffer: await download(m.data),
+                    mime: m.data.message.documentMessage.mimetype,
                     fileid:ob.data.FileId
                 }
                 await upload(gcClients[m.jid],data)
-                return await m.client.sendMessage(m.jid,{text:"file uploaded"},{quoted:m})
+                return await m.client.sendMessage(m.jid,{text:"file uploaded"},{quoted:m.data})
             }
             else{
                 return 0
@@ -128,7 +127,7 @@ async function mn(){
         }
         catch(e){
             console.log(e);
-            return await m.client.sendMessage(m.jid,{text:"An error occured please try again.\nIf the error persists contact devoloper"},{quoted:m})
+            return await m.client.sendMessage(m.jid,{text:"An error occured please try again.\nIf the error persists contact devoloper"},{quoted:m.data})
         }
         
       }

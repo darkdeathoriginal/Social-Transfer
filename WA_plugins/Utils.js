@@ -1,8 +1,10 @@
 const { Module } = require('../WA_index');
 const simpleGit = require('simple-git');
+const Message = require('../WA_lib/Message');
 const git = simpleGit();
 
-Module({ pattern: 'getjids', fromMe: true, desc: 'To get Group jids', use: 'utility' }, async (m,match) => {
+Module({ pattern: 'getjids', fromMe: true, desc: 'To get Group jids', use: 'utility' },
+async (m,match) => {
     
     let groups = Object.keys(await m.client.groupFetchAllParticipating())
     if (!groups.length) return await m.sendReply("_No group chats!_");
@@ -19,14 +21,21 @@ Module({ pattern: 'jid', fromMe: true, desc: 'To get Group jids', use: 'utility'
     
     await m.client.sendMessage(m.jid,{text:m.jid})
 })
-Module({ pattern: 'pp', fromMe: true, desc: 'change profile picture', use: 'utility' }, async (m,match) => {
+Module({ pattern: 'pp', fromMe: true, desc: 'change profile picture', use: 'utility' },
+/**
+ * 
+ * @param {Message} m 
+ * @param {*} match 
+ * @returns 
+ */
+async (m,match) => {
     try{
-        if(m.quoted?.mtype == "imageMessage"){
-            await m.client.updateProfilePicture(m.client.user.id,await m.quoted.download())
+        if(m.reply_message.image){
+            await m.client.updateProfilePicture(m.client.user.id,await m.reply_message.download())
             return await m.send("Profile updated..")
         }
-        else if(m.quoted){
-            let a = await m.client.profilePictureUrl(m.quoted.sender, 'image')
+        else if(m.reply_message){
+            let a = await m.client.profilePictureUrl(m.reply_message.jid, 'image')
             return await m.client.sendMessage(m.jid,{image:{url:a}})
         }
         else{

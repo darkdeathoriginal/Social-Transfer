@@ -278,7 +278,7 @@ onMessage(
   { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
   async (m, match) => {
     if(array[m.quoted?.id]){
-      var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+      var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false
       if (!no) throw "_Reply must be  a number_";
       let data = array[m.quoted.id]
       if(no == '0'){

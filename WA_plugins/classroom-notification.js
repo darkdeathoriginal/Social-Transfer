@@ -49,8 +49,8 @@ Module({ pattern: 'classroom', fromMe: true, desc: 'notification setup command',
 });
 
 onMessage({ pattern: "message", fromMe: true, desc: "Start command", use: "utility" }, async (m, match) => {
-  if (jid == m.jid && state && m.text !== ".test") {
-    if (m.text == "stop") {
+  if (jid == m.jid && state && m.message !== ".test") {
+    if (m.message == "stop") {
       state = null;
       return;
     }
@@ -70,14 +70,14 @@ onMessage({ pattern: "message", fromMe: true, desc: "Start command", use: "utili
 });
 
 states.creds.handle =async (m)=> {
-  let creds = JSON.parse(m.text);
+  let creds = JSON.parse(m.message);
   await fs.writeFileSync(credsPath, JSON.stringify(creds), { encoding: 'utf8' });
   state = null;
   await m.send(`Successfully set credentials.`);
 }
 
 states.options.handle =async (m)=> {
-  var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false;
+  var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false;
   if (!no) throw "_Reply must be a number_";
   if (no == "0") {
     cources = Object.values(DATA);
@@ -94,7 +94,7 @@ states.options.handle =async (m)=> {
 }
 
 states.menu.handle = async (m)=> {
-  var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false;
+  var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false;
   if (!no) throw "_Reply must be a number_";
   if (no == '1') {
     state = states.name.state;
@@ -112,7 +112,7 @@ states.menu.handle = async (m)=> {
 }
 
 states.name.handle =async (m)=> {
-    name = m.text
+    name = m.message
     let creds = require("../creds.json")
     const { client_id, client_secret, redirect_uris } = creds.web
     client = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
@@ -156,7 +156,7 @@ states.name.handle =async (m)=> {
 
 states.jid.handle =async (m)=> {
   ClassDb.sync()
-  let text = m.text
+  let text = m.message
   if(text == "this"){
     forward = m.jid
     let c = {}
@@ -187,7 +187,7 @@ states.jid.handle =async (m)=> {
 }
 
 states.query.handle = async(m)=>{
-  var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+  var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false
   if (!no) throw "_Reply must be  a number_";
   if(DATA[no]){
     name = DATA[no].name
@@ -201,7 +201,7 @@ states.query.handle = async(m)=>{
   }
 }
 states.newjid.handle =async (m)=> {
-  let jid = m.text
+  let jid = m.message
   DATA.forward = jid
   let a = await updateClass(name,DATA)
   state = false
@@ -210,7 +210,7 @@ states.newjid.handle =async (m)=> {
   process.exit(0);
 }
 states.delete.handle =async (m)=> {
-  var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+  var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false
   if (!no) throw "_Reply must be  a number_";
   if(DATA[no]){
     name = DATA[no].name
@@ -228,7 +228,7 @@ states.delete.handle =async (m)=> {
 }
 
 states.clist.handle =async (m)=> {
-  var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+  var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false
   if (!no) throw "_Reply must be  a number_";
   if(DATA[no]){
     let cources = DATA[no].data.cources
@@ -253,7 +253,7 @@ states.clist.handle =async (m)=> {
 }
 
 states.ccources.handle =async (m)=> {
-  var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+  var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false
   if (!no) throw "_Reply must be  a number_";
   if(no == '0'||DATA[no]){
     DATA = DATA[no]?DATA[no]:DATA
@@ -270,7 +270,7 @@ states.ccources.handle =async (m)=> {
 }
 
 states.dtype.handle =async (m)=> {
-  var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+  var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false
   if (!no) throw "_Reply must be  a number_";
   if(no =="1"){
     let list = getDrive(await listAnnouncements(DATA.id,gcClients[name]))
@@ -292,7 +292,7 @@ states.dtype.handle =async (m)=> {
 }
 
 states.download.handle =async (m)=> {
-  var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+  var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false
   if (!no) throw "_Reply must be  a number_";
   if(no == '0'){
     for(let i of Object.values(DATA)){

@@ -43,15 +43,15 @@ Module({ pattern: 'welcome', fromMe: true, desc: 'Welcome message setter', use: 
 })
 
 onMessage({ pattern: 'message', fromMe: false, desc: 'welcome message setter', use: 'utility' }, async (m,match) => {
-    if(m.quoted?.id == this.id && this.state && !m.text.match("welcome")){
+    if(m.quoted?.id == this.id && this.state && !m.message.match("welcome")){
         await welcomeDb.sync()
-        if(m.text == "stop"){
+        if(m.message == "stop"){
             this.state = false
             return 0;
         }
         else{
 
-            var no = /\d+/.test(m.text) ? m.text.match(/\d+/)[0] : false
+            var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false
             if (!no) throw "_Reply must be  a number_";
             let jid = this.data[no]
             if(this.state == "delete"){
