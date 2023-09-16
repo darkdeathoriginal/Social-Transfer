@@ -6,7 +6,7 @@ const fs = require('fs');
 const pino = require('pino')
 const modules = {};
 const onMessages = []
-const {Serialize} = require("./WA_lib/index")
+const {Serialize,Message, Image, Video,Audio} = require("./WA_lib/index")
 const {welcomeDb} = require("./WA_plugins/sql/welcome")
 const JIDS = ['919072215994@s.whatsapp.net','14404448898:22@s.whatsapp.net','']
 const handlers = ['.'];
@@ -151,11 +151,21 @@ const store = makeInMemoryStore({
 
            if (!m.message||m.key.id.startsWith("BAE")) return
            client.readMessages([m.key])
-           Serialize(client,m)
-           
+           if(m.message.imageMessage){
+            m = new Image(client,m)
+           }
+           else if(m.message.videoMessage){
+            m = new Video(client,m)
+           }
+           else if(m.message.audioMessage){
+            m = new Audio(client,m)
+           }
+           else{
+              m = new Message(client,m)
+           }
            const regexPattern = `^[${handlers.map(handler => `\\${handler}`).join('')}]([a-zA-Z]+)(?:\\s+(.+))?`;
-           const text = m.text
-           let jid = m.key.participant?m.key.participant:m.key.remoteJid
+           const text = m.message || ""
+           let jid = m.jid
 		   if (typeof(text) === 'string') {
             
 			   const regex = new RegExp(regexPattern);
