@@ -84,8 +84,10 @@ class Message extends Base {
     return new Message(this.client, message);
   }
 
-  async sendMessage(content, type = MessageType.text, options) {
-    return await this.client.sendMessage(this.jid, content, type, options);
+  async send(text) {
+    return await this.client.sendMessage(this.jid,{
+      text
+   })
   }
 
   async sendTyping() {
@@ -95,6 +97,7 @@ class Message extends Base {
   async sendRead() {
     return await this.client.chatRead(this.jid);
   }
+  
 }
 
 module.exports = Message;

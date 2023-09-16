@@ -92,10 +92,8 @@ class Video extends Base {
     return await this.client.chatRead(this.jid);
   }
 
-  async download(location = this.id) {
-    await this.client.downloadAndSaveMediaMessage(this.data, location);
-
-    return this.id + "." + this.mimetype.split("/")[1];
+  async download() {
+    return await this.client.downloadMediaMessage(this)
   }
 }
 

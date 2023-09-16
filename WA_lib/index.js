@@ -10,6 +10,7 @@ module.exports = {
 
     Image: require('./Image'),
 
-    Video: require('./Video')
+    Video: require('./Video'),
+    Audio : require('./Audio')
 
 };

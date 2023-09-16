@@ -108,17 +108,8 @@ class ReplyMessage extends Base {
     return await this.client.updatePresence(this.jid, Presence.composing);
   }
 
-  async download(location = this.id) {
-    if (this.image) {
-      await this.client.downloadAndSaveMediaMessage(
-        this.data.quotedMessage.imageMessage,
-        location
-      );
-
-      return this.id + "." + this.mimetype.split("/")[1];
-    } else {
-      return false;
-    }
+  async download() {
+    return await this.client.downloadMediaMessage(this)
   }
 }
 
