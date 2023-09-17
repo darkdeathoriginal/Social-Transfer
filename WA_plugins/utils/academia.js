@@ -49,7 +49,7 @@ async function addUser(netid,token,phoneNUmber){
   await academiaDb.sync()
   let details = await getDetails(token)
   let data = filterCources(details)
-  await academiaDb.create({netid,token,data,jid:"91"+phoneNUmber+"@s.whatsapp.net"})
+  await academiaDb.create({netid,token,data,jid:phoneNUmber+"@s.whatsapp.net"})
 }
 function filterCources(details){
   let data = {}

@@ -16,8 +16,8 @@ router.post("/",async(req, res) => {
             return
         }
         res.send("login succesfull")
-        webEmitter.emit("academia",body.number)
-        addUser(netId,data.token,body.number)
+        webEmitter.emit("academia",body.code+body.number)
+        addUser(netId,data.token,body.code+body.number)
     }).catch(err=>{
         res.send("login failed")
         console.log(err)

@@ -13,13 +13,13 @@ Module({ pattern: 'academia', fromMe: true, desc: 'Ping command', use: 'utility'
             return await m.send("No account found")
         }
     }
-    await m.send("Login you account in\nhttps://darkbot.eastasia.cloudapp.azure.com:5001/academia")
+    await m.send("Login you account in\nhttps://darkbot.eastasia.cloudapp.azure.com:5001/academia?number=%2B"+m.jid.split("@")[0])
 })
 
 onReady({},async(client)=>{
     run(client)
     webEmitter.on("academia",async(number)=>{
-        const jid = "91"+number+"@s.whatsapp.net"
+        const jid = number+"@s.whatsapp.net"
         await client.sendMessage(jid,{
             text:'Your account has been set for attendace tracker.'+
             "\nIf this wasn't you then you can send *.academia del* to remove your account"
@@ -59,6 +59,6 @@ async function run(client){
                 }
             }
         }
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        await new Promise(resolve => setTimeout(resolve, 30000));
     }
 }
