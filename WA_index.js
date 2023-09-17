@@ -22,6 +22,10 @@ function onMessage(obj, callback) {
    obj.callback = callback
    onMessages.push(obj)
 }
+function onReady(obj,callback){
+   obj.callback = callback
+   onReadys.push(obj)
+}
 
 const store = makeInMemoryStore({
     logger: pino().child({
@@ -36,6 +40,7 @@ const store = makeInMemoryStore({
  }, 10000)
 
  const connect = async () => {
+   await config.DATABASE.sync()
     const { state, saveCreds } = await useMultiFileAuthState('session')
     const client = Socket({
         logger: pino({
@@ -95,6 +100,7 @@ const store = makeInMemoryStore({
 			module.exports = {
 			Module,
 			onMessage,
+         onReady,
 			modules,
 			client
 			};
@@ -113,6 +119,9 @@ const store = makeInMemoryStore({
 
 			require("./TG_index")
          require("./server/server")
+         for(let i of onReadys){
+            i.callback(client)
+         }
         } else if (connection === 'close') {
            if (lastDisconnect.error.output.statusCode == DisconnectReason.loggedOut) {
               console.log( `Can't connect to Web Socket`);
