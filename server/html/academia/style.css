@@ -113,3 +113,10 @@ body {
   background-color: #fff;
   border-color: #fff;
 }
+
+@media screen and (max-width: 420px){
+  .form-container {
+    width: 80%;
+  }
+
+}
