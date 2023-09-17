@@ -6,10 +6,12 @@ const fs = require('fs');
 const pino = require('pino')
 const modules = {};
 const onMessages = []
-const {Serialize,Message, Image, Video,Audio} = require("./WA_lib/index")
+const onReadys = []
+const config = require("./config")
+const {Message, Image, Video,Audio} = require("./WA_lib/index")
 const {welcomeDb} = require("./WA_plugins/sql/welcome")
-const JIDS = ['919072215994@s.whatsapp.net','14404448898:22@s.whatsapp.net','']
-const handlers = ['.'];
+const JIDS = config.SUDO
+const handlers = config.HANDLERS
 
 
 function Module(obj, callback) {
