@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/html"));
 
-const port = 80;
+const port = 433;
 let server;
 if (
   fs.existsSync("/etc/letsencrypt/live/darkbot.eastasia.cloudapp.azure.com/")
