@@ -177,7 +177,7 @@ const store = makeInMemoryStore({
            }
            const regexPattern = `^[${handlers.map(handler => `\\${handler}`).join('')}]([a-zA-Z]+)(?:\\s+(.+))?`;
            const text = m.message || ""
-           let jid = m.jid
+           let jid = m.data?.key?.participant?m.data.key.participant:m.jid
 		   if (typeof(text) === 'string') {
             
 			   const regex = new RegExp(regexPattern);
