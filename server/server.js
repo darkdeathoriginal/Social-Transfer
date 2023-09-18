@@ -1,6 +1,5 @@
 const express = require("express");
 const https = require("https");
-const http = require('http');
 const fs = require("fs");
 const codeRouter = require("./Routes/code");
 const githubRouter = require("./Routes/github")
@@ -13,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/html"));
 
-const port = 80;
+const port = 433;
 let server;
 if (
   fs.existsSync("/etc/letsencrypt/live/darkbot.eastasia.cloudapp.azure.com/")
@@ -46,12 +45,11 @@ app.use("/academia",academiaRouter)
 app.use("/short",shortnerRouter)
 
 if (server) {
-  console.log("server");
-  server.listen(433, () => {
-    console.log(`https Server is running on port ${433}`);
+  server.listen(port,"0.0.0.0", () => {
+    console.log(`Server is running on port ${port}`);
   });
-} 
-http.createServer(app).listen(port, () => {
-    console.log(`http Server is running on port ${port}`);
-});
-
+} else {
+  server = app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}
