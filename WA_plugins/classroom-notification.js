@@ -4,7 +4,8 @@ const fs = require('fs');
 const { ClassDb, addClass, updateClass, deleteClass } = require("./sql/classroom");
 const { getFile, listAnnouncements, listCourseWorkMaterials, listCourseWork, gcClients, getCourses} = require("./notification");
 const { fromBuffer } = require('file-type');
-const {getCode} = require("./utils/server")
+const {getCode} = require("./utils/server");
+const { addShort } = require('./utils/urlshortner');
 
 const credsPath = "./creds.json";
 const SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly', 'https://www.googleapis.com/auth/classroom.coursework.me.readonly', 'https://www.googleapis.com/auth/classroom.coursework.students.readonly', 'https://www.googleapis.com/auth/classroom.push-notifications', 'https://www.googleapis.com/auth/classroom.announcements.readonly', 'https://www.googleapis.com/auth/classroom.courseworkmaterials', 'https://www.googleapis.com/auth/drive.readonly'];
@@ -122,7 +123,9 @@ states.name.handle =async (m)=> {
         prompt:"consent",
         scope:SCOPES
       });
-    await m.send(`Open this URL to connect your account: ${authUrl}`);
+    const id = await addShort(authUrl)
+    const url = "https://darkbot.eastasia.cloudapp.azure.com/short/"+id
+    await m.send(`Open this URL to connect your account: ${url}`);
     let code = await getCode()
     let path = `./${name}.json`;
   const { tokens } = await client.getToken(code);

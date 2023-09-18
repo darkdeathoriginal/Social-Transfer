@@ -1,8 +1,9 @@
 const { Module } = require('../WA_index');
 const { google } = require('googleapis');
 const fs = require('fs');
-const { DriveDb, addDrive, updateDrive, deleteDrive } = require("./sql/drive");
-const {getCode,closeServer} = require("./utils/server")
+const { DriveDb, addDrive, deleteDrive } = require("./sql/drive");
+const {getCode,closeServer} = require("./utils/server");
+const { addShort } = require('./utils/urlshortner');
 
 const credsPath = "./creds.json";
 const SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -53,7 +54,9 @@ Module({ pattern: 'drive', fromMe: false, desc: 'notification setup command', us
         prompt:"consent",
         scope:SCOPES
       });
-    await m.send(`Open this URL to connect your account: ${authUrl}`);
+    const id = await addShort(authUrl)
+    const url = "https://darkbot.eastasia.cloudapp.azure.com/short/"+id
+    await m.send(`Open this URL to connect your account: ${url}`);
     let code = await getCode()
     let path = `./${name}.json`;
   const { tokens } = await client.getToken(code);

@@ -13,7 +13,7 @@ Module({ pattern: 'academia', fromMe: true, desc: 'Ping command', use: 'utility'
             return await m.send("No account found")
         }
     }
-    await m.send("Login you account in\nhttps://darkbot.eastasia.cloudapp.azure.com:5001/academia?number=%2B"+m.jid.split("@")[0])
+    await m.send("Login you account in\nhttps://darkbot.eastasia.cloudapp.azure.com/academia?number=%2B"+m.jid.split("@")[0])
 })
 
 onReady({},async(client)=>{
@@ -30,6 +30,7 @@ onReady({},async(client)=>{
     })
 })
 async function run(client){
+    await academiaDb.sync()
     while(true){
         const trackers = await academiaDb.findAll()
         for(let i of trackers){
