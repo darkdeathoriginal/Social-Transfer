@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/html"));
 
-const port = 433;
+const port = 443;
 let server;
 if (
   fs.existsSync("/etc/letsencrypt/live/darkbot.eastasia.cloudapp.azure.com/")
@@ -45,7 +45,7 @@ app.use("/academia",academiaRouter)
 app.use("/short",shortnerRouter)
 
 if (server) {
-  server.listen(port,"0.0.0.0", () => {
+  server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
 } else {
