@@ -11,12 +11,17 @@ async function existShort(token){
     return Boolean(await shortnerDb.findOne({where:{token}}))
 }
 async function addShort(url){
-    let token = generateRandomString(6)
-    while(await existShort(token)){
-        token = generateRandomString(6)
-    }
     return await new Promise(async (resolve, reject) => {
         try {
+            if(await shortnerDb.findOne({where:{url}})){
+                let token = (await shortnerDb.findOne({where:{url}})).dataValues.id
+            }
+            else{
+                let token = generateRandomString(6)
+                while(await existShort(token)){
+                    token = generateRandomString(6)
+                }
+            }
             await shortnerDb.create({token,url})
             resolve(token)
         } catch (error) {
