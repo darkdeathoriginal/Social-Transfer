@@ -15,7 +15,7 @@ async function addShort(url){
     return await new Promise(async (resolve, reject) => {
         try {
             if(await shortnerDb.findOne({where:{url}})){
-                token = (await shortnerDb.findOne({where:{url}})).dataValues.id
+                token = (await shortnerDb.findOne({where:{url}})).dataValues.token
             }
             else{
                 token = generateRandomString(6)
