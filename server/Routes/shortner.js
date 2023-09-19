@@ -22,17 +22,10 @@ router.get("/:id",async(req,res)=>{
                     <meta property="og:image" content="${metadata.images[0]}">
                 </head>
                 <body>
-                    <!-- Display the link preview content -->
-                    <p>Link Preview:</p>
-                    <p>Title: ${metadata.title}</p>
-                    <p>Description: ${metadata.description}</p>
-                    <img src="${metadata.images[0]}" alt="Link Preview Image">
-                    
-                    <!-- Redirect to the original URL after a delay -->
                     <script>
                         setTimeout(function() {
                             window.location.href = "${url}";
-                        }, 3000); // Redirect after 3 seconds
+                        }, 10);
                     </script>
                 </body>
                 </html>
