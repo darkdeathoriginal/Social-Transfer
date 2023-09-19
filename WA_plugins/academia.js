@@ -38,7 +38,7 @@ async function run(client){
             const data = filterCources(await getDetails(i.token))
             let change = false
             for(let j of Object.keys(i.data)){
-                if(i.data[j].conducted !== data[j].conducted){
+                if(i.data[j]?.conducted !== data[j]?.conducted){
                     change = true
                     const conductedDiff = data[j].conducted-i.data[j].conducted
                     const absentDiff = data[j].absent-i.data[j].absent
