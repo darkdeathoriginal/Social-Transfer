@@ -10,9 +10,8 @@ router.get("/:id",async(req,res)=>{
     if(id){
         const url = await getShort(id)
         if(url){
-            
-
-            const metadata = await getLinkPreview(url)
+            try {
+                const metadata = await getLinkPreview(url)
             const linkPreviewHTML = `
                 <!DOCTYPE html>
                 <html>
@@ -33,6 +32,12 @@ router.get("/:id",async(req,res)=>{
 
 
             return res.send(linkPreviewHTML);
+            } catch (error) {
+                console.log("error in redirect")
+                console.error(error)
+                return res.send("Url not found")
+            }
+            
 
         }
         return res.send("Url not found")
