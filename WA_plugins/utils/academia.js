@@ -53,11 +53,13 @@ async function addUser(netid,token,phoneNUmber){
 }
 function filterCources(details){
   let data = {}
-  for(let i of details?.courses){
-    data[i.subject_name]={
-      name:i.subject_name,
-      conducted:i.conducted_hours,
-      absent:i.absent_hours
+  if(details?.courses){
+    for(let i of details.courses){
+      data[i.subject_name]={
+        name:i.subject_name,
+        conducted:i.conducted_hours,
+        absent:i.absent_hours
+      }
     }
   }
   return data
