@@ -16,10 +16,12 @@ router.get("/:id",async(req,res)=>{
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta property="og:site_name" content="${metadata.siteName}">
                     <meta property="og:title" content="${metadata.title}">
                     <meta property="og:description" content="${metadata.description}">
                     <meta property="og:image" content="${metadata.images[0]}">
                     <meta property="og:url" content="${url}">
+                    <meta property="og:type" content="${metadata.mediaType}">
                 </head>
                 <body>
                     <script>
