@@ -46,7 +46,7 @@ async function run(client){
                     console.log(data[j].conducted,i.data[j].conducted);
                     console.log(data[j].absent,i.data[j].absent);
                     let msg = `Attendace for ${data[j].name} has been updated\n\n`
-                    if(absentDiff !== i.data[j].absent){
+                    if(absentDiff !== 0){
                         msg+= `You have been marked absent for ${absentDiff} hour${absentDiff>1?"s":""}`
                     }
                     else{
