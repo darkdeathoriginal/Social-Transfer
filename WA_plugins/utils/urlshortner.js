@@ -6,7 +6,7 @@ shortnerDb.sync()
 
 function generateRandomString(length) {
     const bytes = Math.ceil(length / 2);
-    return crypto.randomBytes(bytes).toString().slice(0, length);
+    return crypto.randomBytes(bytes).toString('hex').slice(0, length);
 }
 
 async function existShort(token){
