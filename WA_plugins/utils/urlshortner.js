@@ -53,7 +53,7 @@ async function getShort(token){
 
 async function getMeta(url) {
     return new Promise((resolve, reject) => {
-      axios("https://www.youtube.com/watch?v=IQxea9UB1nQ")
+      axios(url)
         .then(async (response) => {
           const html = response.data;
           const ch = cheerio.load(html);
