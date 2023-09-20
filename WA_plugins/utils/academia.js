@@ -47,11 +47,9 @@ async function existingUser(netid){
 
 async function addUser(netid,token,phoneNUmber){
   await academiaDb.sync()
-  let a = await academiaDb.create({netid,token,jid:phoneNUmber+"@s.whatsapp.net"})
   let details = await getDetails(token)
   let data = filterCources(details)
-  a.dataValues.data = data
-  await a.save()
+  await academiaDb.create({netid,token,data,jid:phoneNUmber+"@s.whatsapp.net"})
 }
 function filterCources(details){
   let data = {}

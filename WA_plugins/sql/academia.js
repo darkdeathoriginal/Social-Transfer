@@ -13,7 +13,6 @@ const academiaDb = config.DATABASE.define('academia', {
     data:{
         type:DataTypes.JSON,
         allowNull:false,
-        defaultValue:{}
     },
     jid:{
         type:DataTypes.STRING,

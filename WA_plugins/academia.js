@@ -6,7 +6,7 @@ const {filterCources, getDetails} = require("./utils/academia")
 Module({ pattern: 'tracker', fromMe: false, desc: 'Ping command', use: 'utility' }, async (m,match) => {
     let msg = ''
     (await academiaDb.findAll()).map((e,i)=>{
-        msg += `${i+1}. ${e.netid}`
+        msg += `${i+1}. ${e.netid}\n`
     })
     return await m.send(msg)
 })
