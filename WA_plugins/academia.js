@@ -43,7 +43,7 @@ async function run(client){
                     const conductedDiff = data[j].conducted-i.data[j].conducted
                     const absentDiff = data[j].absent-i.data[j].absent
                     let msg = `Attendace for ${data[j].name} has been updated\n\n`
-                    if(absentDiff !== data[j].absent){
+                    if(absentDiff !== i.data[j].absent){
                         msg+= `You have been marked absent for ${absentDiff} hour${absentDiff>1?"s":""}`
                     }
                     else{
