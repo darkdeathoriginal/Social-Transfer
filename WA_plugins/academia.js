@@ -2,7 +2,7 @@ const { Module,onMessage,onReady } = require('../WA_index');
 const webEmitter = require('../server/emmiter');
 const academiaDb = require('./sql/academia');
 const {filterCources, getDetails} = require("./utils/academia")
-Module({ pattern: 'academia', fromMe: true, desc: 'Ping command', use: 'utility' }, async (m,match) => {
+Module({ pattern: 'academia', fromMe: false, desc: 'Ping command', use: 'utility' }, async (m,match) => {
     if(match[1] && match[1] =="del"){
         const db = await academiaDb.findOne({where:{jid:m.jid}})
         if(db){
