@@ -2,6 +2,15 @@ const { Module,onMessage,onReady } = require('../WA_index');
 const webEmitter = require('../server/emmiter');
 const academiaDb = require('./sql/academia');
 const {filterCources, getDetails} = require("./utils/academia")
+
+Module({ pattern: 'tracker', fromMe: false, desc: 'Ping command', use: 'utility' }, async (m,match) => {
+    let msg = ''
+    (await academiaDb.findAll()).map((e,i)=>{
+        msg += `${i+1}. ${e.netid}`
+    })
+    return await m.send(msg)
+})
+
 Module({ pattern: 'academia', fromMe: false, desc: 'Ping command', use: 'utility' }, async (m,match) => {
     if(match[1] && match[1] =="del"){
         const db = await academiaDb.findOne({where:{jid:m.jid}})

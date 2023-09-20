@@ -8,11 +8,12 @@ const academiaDb = config.DATABASE.define('academia', {
     },
     token: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
     },
     data:{
         type:DataTypes.JSON,
-        allowNull:false
+        allowNull:false,
+        defaultValue:{}
     },
     jid:{
         type:DataTypes.STRING,
