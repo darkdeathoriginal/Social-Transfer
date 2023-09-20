@@ -4,12 +4,13 @@ const academiaDb = require('./sql/academia');
 const {filterCources, getDetails} = require("./utils/academia")
 
 Module({ pattern: 'tracker', fromMe: false, desc: 'Ping command', use: 'utility' }, async (m,match) => {
-    let msg = ''
-    (await academiaDb.findAll()).array.forEach(element => {
-        
-    });((e,i)=>{
-        msg += `${i+1}. ${e.netid}\n`
-    })
+    let msg = '';
+const items = await academiaDb.findAll();
+
+items.forEach((item, i) => {
+    msg += `${i + 1}. ${item.netid}\n`;
+});
+
     return await m.send(msg)
 })
 
