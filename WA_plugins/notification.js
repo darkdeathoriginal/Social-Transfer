@@ -277,7 +277,7 @@ async function getFile(fileId,gcClient){
 onMessage(
   { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
   async (m, match) => {
-    if(array[m.quoted?.id]){
+    if(array[m.reply_message?.id]){
       var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false
       if (!no) throw "_Reply must be  a number_";
       let data = array[m.quoted.id]
