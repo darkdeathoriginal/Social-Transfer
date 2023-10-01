@@ -66,7 +66,6 @@ async function main(obj){
               array[a.key.id] = list
               list = []
             }
-            console.log(msg);
         }
         if(courseWork?.id&&state[i.id]["courseWork"] != courseWork.id){
             state[i.id]["courseWork"] = courseWork.id
@@ -99,7 +98,6 @@ async function main(obj){
               array[a.key.id] = list
               list = []
             }
-            console.log(msg);
         }
         if(courseWorkMaterial?.id&&state[i.id]["courseWorkMaterial"] != courseWorkMaterial.id){
             state[i.id]["courseWorkMaterial"] = courseWorkMaterial.id
@@ -130,7 +128,6 @@ async function main(obj){
               array[a.key.id] = list
               list = []
             }
-            console.log(msg);
         }
         let data ={
           cources,
@@ -280,7 +277,7 @@ onMessage(
     if(array[m.reply_message?.id]){
       var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false
       if (!no) throw "_Reply must be  a number_";
-      let data = array[m.quoted.id]
+      let data = array[m.reply_message.id]
       if(no == '0'){
         for(let i of Object.values(data)){
           const {id,title,name} = i
