@@ -4,6 +4,13 @@ const academiaDb = require('./sql/academia');
 const {filterCources, getDetails, getAttendance} = require("./utils/academia")
 
 Module({ pattern: 'tracker', fromMe: false, desc: 'Ping command', use: 'utility' }, async (m,match) => {
+    if(match[1] && match[1] =="del"){
+        const items = await academiaDb.findAll();
+        for(let i of items){
+            i.destroy()
+        }
+        return await m.send("Deleted all values")
+    }
     let msg = '';
 const items = await academiaDb.findAll();
 
