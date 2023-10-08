@@ -1,7 +1,7 @@
 const { Module,onMessage,onReady } = require('../WA_index');
 const webEmitter = require('../server/emmiter');
 const academiaDb = require('./sql/academia');
-const {filterCources, getDetails} = require("./utils/academia")
+const {filterCources, getDetails, getAttendance} = require("./utils/academia")
 
 Module({ pattern: 'tracker', fromMe: false, desc: 'Ping command', use: 'utility' }, async (m,match) => {
     let msg = '';
@@ -47,7 +47,7 @@ async function run(client){
         const trackers = await academiaDb.findAll()
         for(let i of trackers){
             const jid = i.jid
-            const data = filterCources(await getDetails(i.token))
+            const data = filterCources(await getAttendance(i.token))
             let change = false
             for(let j of Object.keys(i.data)){
                 if(i.data[j]?.conducted !== data[j]?.conducted){
@@ -57,7 +57,7 @@ async function run(client){
                     console.log({conductedDiff,absentDiff});
                     console.log(data[j].conducted,i.data[j].conducted);
                     console.log(data[j].absent,i.data[j].absent);
-                    let msg = `Attendace for ${data[j].name} has been updated\n\n`
+                    let msg = `Attendace for ${data[j].title} has been updated\n\n`
                     if(absentDiff !== 0){
                         msg+= `You have been marked absent for ${absentDiff} hour${absentDiff>1?"s":""}`
                     }
