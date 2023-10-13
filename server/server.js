@@ -15,18 +15,18 @@ app.use(express.static(__dirname + "/html"));
 const port = 443;
 let server;
 if (
-  fs.existsSync("/etc/letsencrypt/live/darkbot.eastasia.cloudapp.azure.com/")
+  fs.existsSync("/etc/letsencrypt/live/darkbot.centralindia.cloudapp.azure.com/")
 ) {
   const privateKey = fs.readFileSync(
-    "/etc/letsencrypt/live/darkbot.eastasia.cloudapp.azure.com/privkey.pem",
+    "/etc/letsencrypt/live/darkbot.centralindia.cloudapp.azure.com/privkey.pem",
     "utf8"
   );
   const certificate = fs.readFileSync(
-    "/etc/letsencrypt/live/darkbot.eastasia.cloudapp.azure.com/cert.pem",
+    "/etc/letsencrypt/live/darkbot.centralindia.cloudapp.azure.com/cert.pem",
     "utf8"
   );
   const ca = fs.readFileSync(
-    "/etc/letsencrypt/live/darkbot.eastasia.cloudapp.azure.com/chain.pem",
+    "/etc/letsencrypt/live/darkbot.centralindia.cloudapp.azure.com/chain.pem",
     "utf8"
   );
 
