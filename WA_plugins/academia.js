@@ -33,7 +33,7 @@ Module({ pattern: 'academia', fromMe: false, desc: 'Ping command', use: 'utility
             return await m.send("No account found")
         }
     }
-    await m.send(`Login you account in\n${SERVER}?number=%2B`+m.jid.split("@")[0])
+    await m.send(`Login you account in\n${SERVER}/academia?number=%2B`+m.jid.split("@")[0])
 })
 
 onReady({},async(client)=>{
