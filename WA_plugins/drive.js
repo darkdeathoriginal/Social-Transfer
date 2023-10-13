@@ -55,7 +55,7 @@ Module({ pattern: 'drive', fromMe: false, desc: 'notification setup command', us
         scope:SCOPES
       });
     const id = await addShort(authUrl)
-    const url = "https://darkbot.eastasia.cloudapp.azure.com/short/"+id
+    const url = `${SERVER}/short/`+id
     await m.send(`Open this URL to connect your account: ${url}`);
     let code = await getCode()
     let path = `./${name}.json`;

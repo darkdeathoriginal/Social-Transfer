@@ -1,7 +1,8 @@
-const { Module,onMessage,onReady } = require('../WA_index');
+const { Module,onReady } = require('../WA_index');
+const { SERVER } = require('../config');
 const webEmitter = require('../server/emmiter');
 const academiaDb = require('./sql/academia');
-const {filterCources, getDetails, getAttendance} = require("./utils/academia")
+const {filterCources, getAttendance} = require("./utils/academia")
 
 Module({ pattern: 'tracker', fromMe: true, desc: 'Ping command', use: 'utility' }, async (m,match) => {
     if(match[1] && match[1] =="del"){
@@ -32,7 +33,7 @@ Module({ pattern: 'academia', fromMe: false, desc: 'Ping command', use: 'utility
             return await m.send("No account found")
         }
     }
-    await m.send("Login you account in\nhttps://darkbot.eastasia.cloudapp.azure.com/academia?number=%2B"+m.jid.split("@")[0])
+    await m.send(`Login you account in\n${SERVER}?number=%2B`+m.jid.split("@")[0])
 })
 
 onReady({},async(client)=>{

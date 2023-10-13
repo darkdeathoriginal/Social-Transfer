@@ -9,7 +9,7 @@ Module({ pattern: 'short', fromMe: true, desc: 'Url shortner', use: 'utility' },
     }
     const url = match[1]
     addShort(url).then(async id=>{
-        return await m.send("https://darkbot.eastasia.cloudapp.azure.com/short/"+id)
+        return await m.send(`${SERVER}/short/`+id)
     }).catch(err=>{
         console.log("error in addShort");
         console.error(err)

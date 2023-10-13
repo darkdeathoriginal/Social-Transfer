@@ -1,5 +1,5 @@
 const express = require("express")
-const { getToken, existingUser, addUser, getCookie } = require("../../WA_plugins/utils/academia")
+const {existingUser, addUser, getCookie } = require("../../WA_plugins/utils/academia")
 const webEmitter = require("../emmiter")
 const router = express.Router()
 

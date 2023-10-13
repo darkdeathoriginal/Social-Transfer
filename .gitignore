@@ -1,6 +1,5 @@
 node_modules
 bot.db
-package-lock.json
 session
 .env
 creds.json
