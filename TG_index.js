@@ -1,9 +1,10 @@
-const { TelegramClient,Api } = require('telegram');
+const { TelegramClient,Api, Logger } = require('telegram');
 const { StringSession } = require('telegram/sessions');
 const { NewMessage } = require('telegram/events');
 const { CustomFile } = require("telegram/client/uploads");
 const input = require('input')
 const fs = require('fs');
+const { LogLevel } = require('telegram/extensions/Logger');
 require('dotenv').config();
 const modules = [];
 class AddCmd {
@@ -222,6 +223,7 @@ const stringSession = new StringSession(session||"");
 
 global.conn = new TelegramClient(stringSession, apiId, apiHash, {
     connectionRetries: 5,
+    baseLogger: new Logger(LogLevel.ERROR),
   });
   
 
