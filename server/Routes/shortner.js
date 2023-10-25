@@ -18,9 +18,7 @@ router.get("/:id",async(req,res)=>{
                 </head>
                 <body>
                     <script>
-                        setTimeout(function() {
-                            window.location.href = "${url}";
-                        }, 10);
+                        window.location.href = "${url}";
                     </script>
                 </body>
                 </html>
