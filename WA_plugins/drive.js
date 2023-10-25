@@ -4,6 +4,7 @@ const fs = require('fs');
 const { DriveDb, addDrive, deleteDrive } = require("./sql/drive");
 const {getCode,closeServer} = require("./utils/server");
 const { addShort } = require('./utils/urlshortner');
+const { SERVER } = require('../config');
 
 const credsPath = "./creds.json";
 const SCOPES = ['https://www.googleapis.com/auth/drive']

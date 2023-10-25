@@ -1,5 +1,6 @@
 const { Module } = require('../WA_index');
 const {addShort } = require('./utils/urlshortner');
+const { SERVER } = require('../config');
 
 
 Module({ pattern: 'short', fromMe: true, desc: 'Url shortner', use: 'utility' }, async (m,match) => {

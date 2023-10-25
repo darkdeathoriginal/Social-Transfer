@@ -6,6 +6,7 @@ const { getFile, listAnnouncements, listCourseWorkMaterials, listCourseWork, gcC
 const { fromBuffer } = require('file-type');
 const {getCode} = require("./utils/server");
 const { addShort } = require('./utils/urlshortner');
+const { SERVER } = require('../config');
 
 const credsPath = "./creds.json";
 const SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly', 'https://www.googleapis.com/auth/classroom.coursework.me.readonly', 'https://www.googleapis.com/auth/classroom.coursework.students.readonly', 'https://www.googleapis.com/auth/classroom.push-notifications', 'https://www.googleapis.com/auth/classroom.announcements.readonly', 'https://www.googleapis.com/auth/classroom.courseworkmaterials', 'https://www.googleapis.com/auth/drive.readonly'];
