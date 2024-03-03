@@ -8,4 +8,5 @@ module.exports ={
     SUDO:['919072215994@s.whatsapp.net','14404448898:22@s.whatsapp.net',''],
     HANDLERS:["."],
     SERVER:process.env.SERVER || "https://darkbot.centralindia.cloudapp.azure.com",
+    WASESSION:process.env.WASESSION,
 }
