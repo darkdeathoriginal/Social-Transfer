@@ -4,14 +4,13 @@ const fs = require("fs");
 const codeRouter = require("./Routes/code");
 const githubRouter = require("./Routes/github")
 const shortnerRouter = require("./Routes/shortner")
+const {PORT:port} = require("../config")
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/html"));
-
-const port = 443;
 let server;
 if (
   fs.existsSync("/etc/letsencrypt/live/darkbot.centralindia.cloudapp.azure.com/")

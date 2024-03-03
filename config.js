@@ -9,4 +9,5 @@ module.exports ={
     HANDLERS:["."],
     SERVER:process.env.SERVER || "https://darkbot.centralindia.cloudapp.azure.com",
     WASESSION:process.env.WASESSION,
+    PORT:process.env.PORT || 3000,
 }
