@@ -3,7 +3,6 @@ const https = require("https");
 const fs = require("fs");
 const codeRouter = require("./Routes/code");
 const githubRouter = require("./Routes/github")
-const academiaRouter = require("./Routes/academia")
 const shortnerRouter = require("./Routes/shortner")
 
 const app = express();
@@ -41,7 +40,6 @@ if (
 
 app.use("/", codeRouter);
 app.use("/github",githubRouter)
-app.use("/academia",academiaRouter)
 app.use("/short",shortnerRouter)
 
 if (server) {
