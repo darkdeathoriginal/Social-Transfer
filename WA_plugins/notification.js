@@ -33,104 +33,118 @@ async function main(obj) {
       for (let i of cources) {
         let haschange = false;
         let list = {};
-        let announcement = (await listAnnouncements(i.id, gcClient))[0];
-        let courseWork = (await listCourseWork(i.id, gcClient))[0];
-        let courseWorkMaterial = (
-          await listCourseWorkMaterials(i.id, gcClient)
-        )[0];
-
-        if (
-          announcement?.id &&
-          state[i.id]["announcement"] != announcement.id
-        ) {
-          state[i.id]["announcement"] = announcement.id;
-          haschange = true;
-          const { text } = announcement;
-          let msg = `${i.name}:\nNew announcement\n${text}`;
-          if (announcement.materials) {
-            msg += "\n\nMaterials:";
-            let n = 1;
-            for (let i of announcement.materials) {
-              if (i.driveFile) {
-                const { id, title, alternateLink } = i.driveFile.driveFile;
-                list[n] = { id, title, name: obj.name };
-                msg += `\n${title} : ${alternateLink}`;
-                n++;
+        let announcements = await listAnnouncements(i.id, gcClient);
+        let courseWorks = await listCourseWork(i.id, gcClient);
+        let courseWorkMaterials = await listCourseWorkMaterials(i.id, gcClient);
+        for (let k = 0; k < announcements.length; k++) {
+          if (state[i.id]["announcement"] == announcements[k].id) {
+            for (let j = 0; j < k; j++) {
+              haschange = true;
+              const { text } = announcements[j];
+              let msg = `${i.name}:\nNew announcement\n${text}`;
+              if (announcements[j].materials) {
+                msg += "\n\nMaterials:";
+                let n = 1;
+                for (let m of announcements[j].materials) {
+                  if (m.driveFile) {
+                    const { id, title, alternateLink } = m.driveFile.driveFile;
+                    list[n] = { id, title, name: obj.name };
+                    msg += `\n${title} : ${alternateLink}`;
+                    n++;
+                  }
+                  if (m.link) {
+                    msg += `\n${m.link.url}`;
+                  }
+                }
               }
-              if (i.link) {
-                msg += `\n${i.link.url}`;
+              let a = await client.sendMessage(forward, { text: msg });
+              if (list.length > 0) {
+                array[a.key.id] = list;
+                list = [];
               }
             }
-          }
-          let a = await client.sendMessage(forward, { text: msg });
-          if (list[1]) {
-            array[a.key.id] = list;
-            list = [];
+            break;
           }
         }
-        if (courseWork?.id && state[i.id]["courseWork"] != courseWork.id) {
-          state[i.id]["courseWork"] = courseWork.id;
-          haschange = true;
-          let msg = `${i.name}:\nNew course work\n${courseWork.title}`;
-          if (courseWork.description) {
-            msg += `\nInstruction : ${courseWork.description}`;
-          }
-          if (courseWork.dueDate) {
-            msg += `\nDue date : ${courseWork.dueDate.day}-${courseWork.dueDate.month}-${courseWork.dueDate.year}`;
-          }
-
-          if (courseWork.materials) {
-            msg += "\n\nMaterials:";
-            let n = 1;
-            for (let i of courseWork.materials) {
-              if (i.driveFile) {
-                const { id, title, alternateLink } = i.driveFile.driveFile;
-                list[n] = { id, title, name: obj.name };
-                msg += `\n${title} : ${alternateLink}`;
-                n++;
+        if (announcements[0]?.id) {
+          state[i.id]["announcement"] = announcements[0].id;
+        }
+        for (let k = 0; k < courseWorks.length; k++) {
+          if (state[i.id]["courseWork"] == courseWorks[k].id) {
+            for (let j = 0; j < k; j++) {
+              haschange = true;
+              const { title, description, dueDate, materials } = courseWorks[j];
+              let msg = `${i.name}:\nNew course work\n${title}`;
+              if (description) {
+                msg += `\nInstruction : ${description}`;
               }
-              if (i.link) {
-                msg += `\n${i.link.url}`;
+              if (dueDate) {
+                msg += `\nDue date : ${dueDate.day}-${dueDate.month}-${dueDate.year}`;
+              }
+
+              if (materials) {
+                msg += "\n\nMaterials:";
+                let n = 1;
+                for (let m of materials) {
+                  if (m.driveFile) {
+                    const { id, title, alternateLink } = m.driveFile.driveFile;
+                    list[n] = { id, title, name: obj.name };
+                    msg += `\n${title} : ${alternateLink}`;
+                    n++;
+                  }
+                  if (m.link) {
+                    msg += `\n${m.link.url}`;
+                  }
+                }
+              }
+              let a = await client.sendMessage(forward, { text: msg });
+              if (list.length > 0) {
+                array[a.key.id] = list;
+                list = [];
               }
             }
-          }
-          let a = await client.sendMessage(forward, { text: msg });
-          if (list[1]) {
-            array[a.key.id] = list;
-            list = [];
+            break;
           }
         }
-        if (
-          courseWorkMaterial?.id &&
-          state[i.id]["courseWorkMaterial"] != courseWorkMaterial.id
-        ) {
-          state[i.id]["courseWorkMaterial"] = courseWorkMaterial.id;
-          haschange = true;
-          let msg = `${i.name}:\nNew material\n${courseWorkMaterial.title}`;
-          if (courseWorkMaterial.description) {
-            msg += `\n${courseWorkMaterial.description}`;
-          }
-
-          if (courseWorkMaterial.materials) {
-            msg += "\n\nMaterials:";
-            let n = 1;
-            for (let i of courseWorkMaterial.materials) {
-              if (i.driveFile) {
-                const { id, title, alternateLink } = i.driveFile.driveFile;
-                list[n] = { id, title, name: obj.name };
-                msg += `\n${title} : ${alternateLink}`;
-                n++;
+        if (courseWorks[0]?.id) {
+          state[i.id]["courseWork"] = courseWorks[0].id;
+        }
+        for (let k = 0; k < courseWorkMaterials.length; k++) {
+          if (state[i.id]["courseWorkMaterial"] == courseWorkMaterials[k].id) {
+            for (let j = 0; j < k; j++) {
+              haschange = true;
+              const { title, description, materials } = courseWorkMaterials[j];
+              let msg = `${i.name}:\nNew material\n${title}`;
+              if (description) {
+                msg += `\n${description}`;
               }
-              if (i.link) {
-                msg += `\n${i.link.url}`;
+
+              if (materials) {
+                msg += "\n\nMaterials:";
+                let n = 1;
+                for (let m of materials) {
+                  if (m.driveFile) {
+                    const { id, title, alternateLink } = m.driveFile.driveFile;
+                    list[n] = { id, title, name: obj.name };
+                    msg += `\n${title} : ${alternateLink}`;
+                    n++;
+                  }
+                  if (m.link) {
+                    msg += `\n${m.link.url}`;
+                  }
+                }
+              }
+              let a = await client.sendMessage(forward, { text: msg });
+              if (list.length > 0) {
+                array[a.key.id] = list;
+                list = [];
               }
             }
+            break;
           }
-          let a = await client.sendMessage(forward, { text: msg });
-          if (list[1]) {
-            array[a.key.id] = list;
-            list = [];
-          }
+        }
+        if (courseWorkMaterials[0]?.id) {
+          state[i.id]["courseWorkMaterial"] = courseWorkMaterials[0].id;
         }
         let data = {
           cources,
@@ -145,11 +159,11 @@ async function main(obj) {
     }
     async function getAuthToken() {
       const token = await UserDb.findOne({ where: { name: obj.name } });
-      return token
+      return token;
     }
 
     async function verifyAndUpdateToken(token) {
-      const json =await  UserDb.findOne({ where: { name: obj.name } });
+      const json = await UserDb.findOne({ where: { name: obj.name } });
 
       if (token !== json.access_token) {
         json.access_token = token;
@@ -311,5 +325,5 @@ module.exports = {
   listCourseWork,
   gcClients,
   getCourses,
-  main
+  main,
 };
