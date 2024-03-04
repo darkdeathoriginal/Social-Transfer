@@ -38,6 +38,7 @@ let name = null;
 let client = null;
 let forward = null;
 let cources = null;
+let stateTimeout = null;
 
 const states = {
   creds: { state: "creds" },
@@ -209,8 +210,9 @@ states.jid.handle = async (m) => {
     state: c,
   };
   await addClass(name, data);
+  await m.send("Successfully set notification");
   main({ name, data });
-  return await m.send("Successfully set notification");
+  state = null;
 };
 
 states.query.handle = async (m) => {
@@ -246,7 +248,7 @@ states.delete.handle = async (m) => {
     await m.send("succesfully removed");
     process.exit(0);
   } else {
-    state = false;
+    setStateTimeout()
     await m.send("Invalid option");
   }
 };
@@ -269,7 +271,7 @@ states.clist.handle = async (m) => {
     DATA = data;
     return await m.send(msg);
   } else {
-    state = false;
+    setStateTimeout()
     await m.send("Invalid option");
   }
 };
@@ -283,7 +285,7 @@ states.ccources.handle = async (m) => {
     let msg = "1. announcement\n" + "2. courseWork\n" + "3. courseWorkMaterial";
     return await m.send(msg);
   } else {
-    state = false;
+    setStateTimeout()
     await m.send("Invalid option");
   }
 };
@@ -303,7 +305,7 @@ states.dtype.handle = async (m) => {
     );
     return await handleDlist(m, list);
   } else {
-    state = false;
+    setStateTimeout()
     await m.send("Invalid option");
   }
 };
@@ -318,7 +320,7 @@ states.download.handle = async (m) => {
   } else if (DATA[no]) {
     return await handleDl(m, DATA[no]);
   } else {
-    state = false;
+    setStateTimeout()
     await m.send("Invalid option");
   }
 };
@@ -345,7 +347,7 @@ async function handleDl(m, obj) {
   const { title, id } = obj;
   let buffer = await getFile(id, gcClients[name]);
   let { mime } = await fromBuffer(buffer);
-  state = false;
+  setStateTimeout()
   return await m.client.sendMessage(m.jid, {
     document: buffer,
     fileName: title,
@@ -376,4 +378,8 @@ function getDrive(array) {
     }
   });
   return list;
+}
+function setStateTimeout() {
+  if(stateTimeout) clearTimeout(stateTimeout);
+  stateTimeout = setTimeout(()=>state = false, 20000);
 }
