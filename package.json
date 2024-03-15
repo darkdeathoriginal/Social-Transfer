@@ -20,6 +20,7 @@
     "googleapis": "^122.0.0",
     "input": "^1.0.1",
     "link-preview-js": "^3.0.5",
+    "pdfkit": "^0.14.0",
     "pino": "^8.14.1",
     "pm2": "^5.3.0",
     "qrcode-terminal": "^0.12.0",
