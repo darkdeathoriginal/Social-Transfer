@@ -58,7 +58,7 @@ async function main(obj) {
                 }
               }
               let a = await client.sendMessage(forward, { text: msg });
-              if (list.length > 0) {
+              if(list[1]){
                 array[a.key.id] = list;
                 list = [];
               }
@@ -98,7 +98,7 @@ async function main(obj) {
                 }
               }
               let a = await client.sendMessage(forward, { text: msg });
-              if (list.length > 0) {
+              if(list[1]){
                 array[a.key.id] = list;
                 list = [];
               }
@@ -135,7 +135,7 @@ async function main(obj) {
                 }
               }
               let a = await client.sendMessage(forward, { text: msg });
-              if (list.length > 0) {
+              if(list[1]){
                 array[a.key.id] = list;
                 list = [];
               }
