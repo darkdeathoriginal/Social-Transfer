@@ -36,6 +36,9 @@ async function main(obj) {
         let announcements = await listAnnouncements(i.id, gcClient);
         let courseWorks = await listCourseWork(i.id, gcClient);
         let courseWorkMaterials = await listCourseWorkMaterials(i.id, gcClient);
+        if(!state[i.id]["announcement"]) state[i.id]["announcement"] = announcements[1]?.id;
+        if(!state[i.id]["courseWork"]) state[i.id]["courseWork"] = courseWorks[1]?.id;
+        if(!state[i.id]["courseWorkMaterial"]) state[i.id]["courseWorkMaterial"] = courseWorkMaterials[1]?.id;
         for (let k = 0; k < announcements.length; k++) {
           if (state[i.id]["announcement"] == announcements[k].id) {
             for (let j = 0; j < k; j++) {

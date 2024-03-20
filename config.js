@@ -8,7 +8,7 @@ module.exports ={
     DATABASE: DATABASE_URL === './bot.db' ? new Sequelize({ dialect: "sqlite", storage: DATABASE_URL, logging: false }) : new Sequelize(DATABASE_URL, { dialectOptions: { ssl: { require: true, rejectUnauthorized: false } }, logging: false }),   
     SUDO:['919072215994@s.whatsapp.net','14404448898:22@s.whatsapp.net',''],
     HANDLERS:process.env.HANDLERS?.split(" ")??["."],
-    SERVER:process.env.SERVER || "https://darkbot.centralindia.cloudapp.azure.com",
+    SERVER:process.env.SERVER || "http://localhost:3000",
     WASESSION:process.env.WASESSION,
     PORT:process.env.PORT || 3000,
 }
