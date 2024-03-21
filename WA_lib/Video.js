@@ -1,7 +1,5 @@
 const {
-  MessageType,
   Presence,
-  MessageOptions,
 } = require("@adiwajshing/baileys");
 
 const Base = require("./Base");
@@ -48,7 +46,7 @@ class Video extends Base {
 
     if (
       data.message.videoMessage.hasOwnProperty("contextInfo") &&
-      data.message.contextInfo.quotedMessage
+      data.message.contextInfo?.quotedMessage
     ) {
       this.reply_message = new ReplyMessage(
         this.client,
