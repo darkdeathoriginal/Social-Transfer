@@ -1,6 +1,6 @@
 const {
   Presence,
-} = require("@adiwajshing/baileys");
+} = require("@whiskeysockets/baileys");
 
 const Base = require("./Base");
 

@@ -1,6 +1,6 @@
 const fs = require('fs')
 const pino = require('pino')
-const baileys = fs.existsSync('./node_modules/baileys') ? 'baileys' : fs.existsSync('./node_modules/@adiwajshing/baileys') ? '@adiwajshing/baileys' : 'bails'
+const baileys = fs.existsSync('./node_modules/baileys') ? 'baileys' : fs.existsSync('./node_modules/@whiskeysockets/baileys') ? '@whiskeysockets/baileys' : 'bails'
 const {
    default: makeWASocket,
    proto,
