@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@adiwajshing/baileys": "npm:baileys@6.0.8",
+    "@adiwajshing/baileys": "git+https://github.com/souravkl11/Baileys.git",
     "@adiwajshing/keyed-db": "^0.2.4",
     "axios": "^1.6.7",
     "cheerio": "^1.0.0-rc.12",

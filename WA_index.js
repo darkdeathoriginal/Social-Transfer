@@ -157,6 +157,7 @@ const connect = async () => {
     version: [2, 2308, 7],
   });
   store.bind(client.ev);
+  client.store = store;
   client.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect, qr } = update;
     if (lastDisconnect == "undefined" && qr != "undefined") {

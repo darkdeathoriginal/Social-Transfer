@@ -12,7 +12,7 @@ Module({ pattern: 'ping', fromMe: true, desc: 'Ping command', use: 'utility' }, 
 })
 Module(
   {
-    pattern: "reboot",
+    pattern: "rbt",
     fromMe: true,
     desc: "restarts the bot",
     use: "utility",
@@ -26,11 +26,11 @@ onMessage(
   { pattern: "message", fromMe: true, desc: "Start command", use: "utility" },
   async (m, match) => {
     let text = m.message
-    if (text&&text.startsWith&&text.startsWith(">")) {
+    if (text&&text.startsWith&&text.startsWith("/")) {
       const util = require("util");
       try {
         let return_val = await eval(
-          `(async () => { ${text.replace(">", "")} })()`
+          `(async () => { ${text.replace("/", "")} })()`
         );
         if (return_val && typeof return_val !== "string")
           return_val = util.inspect(return_val);

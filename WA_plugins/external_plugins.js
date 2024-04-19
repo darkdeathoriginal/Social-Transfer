@@ -57,7 +57,7 @@ Module({
 }, (async (message, match) => {
     await Db.PluginDB.sync();
     var plugins = await Db.PluginDB.findAll();
-    if (match[1] !== '') {
+    if (match[1]&&match[1] !== '') {
         var plugin = plugins.filter(_plugin => _plugin.dataValues.name === match[1])
         try {
             await message.send(`_${plugin[0].dataValues.name}:_ ${plugin[0].dataValues.url}`);
@@ -67,8 +67,8 @@ Module({
         return;
     }
     var msg = "\n";
-    var plugins = await Db.PluginDB.findAll();
     if (plugins.length < 1) {
+        console.log(plugins);
         return await message.send("plugin not found");
     } else {
         plugins.map(
