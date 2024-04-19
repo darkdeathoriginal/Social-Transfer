@@ -81,7 +81,7 @@ Module({
 }));
 
 Module({
-    pattern: 'remove',
+    pattern: 'rmp',
     fromMe: true,
     use: 'owner',
     desc: "plugin remover"
