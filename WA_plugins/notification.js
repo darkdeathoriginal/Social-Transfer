@@ -44,19 +44,19 @@ async function main(obj) {
             for (let j = 0; j < k; j++) {
               haschange = true;
               const { text } = announcements[j];
-              let msg = `${i.name}:\nNew announcement\n${text}`;
+              let msg = `*${i.name}*\n> Announcement\n\n${text.split("\n").map((i) =>"_"+i+"_").join("\n")}`;
               if (announcements[j].materials) {
-                msg += "\n\nMaterials:";
+                msg += "\n\n*Materials*";
                 let n = 1;
                 for (let m of announcements[j].materials) {
                   if (m.driveFile) {
                     const { id, title, alternateLink } = m.driveFile.driveFile;
                     list[n] = { id, title, name: obj.name };
-                    msg += `\n${title} : ${alternateLink}`;
+                    msg += `\n> ${title} : ${alternateLink}`;
                     n++;
                   }
                   if (m.link) {
-                    msg += `\n${m.link.url}`;
+                    msg += `\n> ${m.link.url}`;
                   }
                 }
               }
@@ -77,26 +77,26 @@ async function main(obj) {
             for (let j = 0; j < k; j++) {
               haschange = true;
               const { title, description, dueDate, materials } = courseWorks[j];
-              let msg = `${i.name}:\nNew course work\n${title}`;
+              let msg = `*${i.name}*\n> Assignment\n\n${title}`;
               if (description) {
-                msg += `\nInstruction : ${description}`;
+                msg += `\n*Instruction*\n${description.split("\n").map((i) =>"_"+i+"_").join("\n")}`;
               }
               if (dueDate) {
-                msg += `\nDue date : ${dueDate.day}-${dueDate.month}-${dueDate.year}`;
+                msg += `\n> Due date : ${dueDate.day}-${dueDate.month}-${dueDate.year}`;
               }
 
               if (materials) {
-                msg += "\n\nMaterials:";
+                msg += "\n\n*Materials*";
                 let n = 1;
                 for (let m of materials) {
                   if (m.driveFile) {
                     const { id, title, alternateLink } = m.driveFile.driveFile;
                     list[n] = { id, title, name: obj.name };
-                    msg += `\n${title} : ${alternateLink}`;
+                    msg += `\n> ${title} : ${alternateLink}`;
                     n++;
                   }
                   if (m.link) {
-                    msg += `\n${m.link.url}`;
+                    msg += `\n> ${m.link.url}`;
                   }
                 }
               }
@@ -117,23 +117,23 @@ async function main(obj) {
             for (let j = 0; j < k; j++) {
               haschange = true;
               const { title, description, materials } = courseWorkMaterials[j];
-              let msg = `${i.name}:\nNew material\n${title}`;
+              let msg = `*${i.name}*\n> Materials\n\n${title}`;
               if (description) {
-                msg += `\n${description}`;
+                msg += `\n${description.split("\n").map((i) =>"_"+i+"_").join("\n")}`;
               }
 
               if (materials) {
-                msg += "\n\nMaterials:";
+                msg += "\n\n*Materials*";
                 let n = 1;
                 for (let m of materials) {
                   if (m.driveFile) {
                     const { id, title, alternateLink } = m.driveFile.driveFile;
                     list[n] = { id, title, name: obj.name };
-                    msg += `\n${title} : ${alternateLink}`;
+                    msg += `\n> ${title} : ${alternateLink}`;
                     n++;
                   }
                   if (m.link) {
-                    msg += `\n${m.link.url}`;
+                    msg += `\n> ${m.link.url}`;
                   }
                 }
               }
