@@ -8,7 +8,7 @@ const Db = require('./sql/plugin');
 
 
 Module({
-    pattern: 'install',
+    pattern: 'inp',
     fromMe: true,
     use: 'owner',
     desc: "plugin installer"
