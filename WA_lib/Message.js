@@ -22,11 +22,7 @@ class Message extends Base {
 
     this.fromMe = data.key.fromMe;
 
-    this.message =
-      data.message.extendedTextMessage === null
-        ? data.message.conversation
-        : data.message.extendedTextMessage.text;
-
+    this.message =data.message?.extendedTextMessage?.text || data.message?.conversation ||data.message?.templateButtonReplyMessage?.selectedDisplayText || ""
     this.unreadCount = data.unreadCount;
 
     this.timestamp =
@@ -45,7 +41,7 @@ class Message extends Base {
     ) {
       this.reply_message = new ReplyMessage(
         this.client,
-        data.message.extendedTextMessage.contextInfo
+        data.message.extendedTextMessage.contextInfo.quotedMessage
       );
     } else {
       this.reply_message = false;
