@@ -2,6 +2,7 @@ const {
   MessageType,
   Presence,
   MessageOptions,
+  downloadMediaMessage,
 } = require("@whiskeysockets/baileys");
 
 const Base = require("./Base");
@@ -109,7 +110,7 @@ class ReplyMessage extends Base {
   }
 
   async download() {
-    return await this.client.downloadMediaMessage(this)
+    return await downloadMediaMessage(this.data, "buffer", {}, {});
   }
 }
 
