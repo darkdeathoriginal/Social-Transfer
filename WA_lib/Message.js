@@ -41,7 +41,7 @@ class Message extends Base {
     ) {
       this.reply_message = new ReplyMessage(
         this.client,
-        data.message.extendedTextMessage.contextInfo.quotedMessage
+        data.message.extendedTextMessage.contextInfo
       );
     } else {
       this.reply_message = false;
