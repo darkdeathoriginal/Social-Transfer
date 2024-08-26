@@ -40,8 +40,8 @@ Module({ pattern: 'drive', fromMe: false, desc: 'notification setup command', us
         }
     }
     else{
-        state = states.name.state;
         jid = m.jid;
+        return states.name.handle(m);
     }
   }
 });
@@ -52,7 +52,6 @@ onMessage({ pattern: 'message', fromMe: false }, async (m, match) => {
       state = null;
       return await m.send("Setup process stopped.");
     }
-
     try {
       if (states[state]) {
         return await states[state].handle(m);
