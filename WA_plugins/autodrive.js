@@ -5,6 +5,7 @@ const fs = require("fs");
 const { DriveDb } = require("./sql/drive");
 const { onMessage } = require("../WA_index");
 const { Readable } = require("stream");
+const {Semaphore} = require("../lib/helpers");
 
 const credsPath = "./creds.json";
 const RUN = process.env.NOTIFICATION ? process.env.NOTIFICATION : false;
