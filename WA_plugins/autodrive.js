@@ -81,7 +81,7 @@ async function mn(){
                 const indianDate = new Date().toLocaleString('en-US', { timeZone: indianTimeZone });
                 let data = {
                     name:`${indianDate}.jpg`,
-                    buffer: await m.download(),
+                    buffer: await download(m.data),
                     mime:"image/jpg",
                     fileid:ob.data.FileId
                 }
@@ -92,7 +92,7 @@ async function mn(){
                 const indianDate = new Date().toLocaleString('en-US', { timeZone: indianTimeZone });
                 let data = {
                     name:`${indianDate}.mp4`,
-                    buffer: await m.download(),
+                    buffer: await download(m.data),
                     mime:"video/mp4",
                     fileid:ob.data.FileId
                 }
@@ -103,7 +103,7 @@ async function mn(){
                 const indianDate = new Date().toLocaleString('en-US', { timeZone: indianTimeZone });
                 let data = {
                     name:`${indianDate}.mp3`,
-                    buffer: await m.download(),
+                    buffer: await download(m.data),
                     mime:"audio/mp3",
                     fileid:ob.data.FileId
                 }
@@ -158,7 +158,7 @@ async function mn(){
   }
 
   function download(file){
-    const { downloadMediaMessage } =require('@adiwajshing/baileys')
+    const { downloadMediaMessage } =require('@whiskeysockets/baileys')
     return new Promise(async(resolve) => {
         const buffer = await downloadMediaMessage(
                     file,

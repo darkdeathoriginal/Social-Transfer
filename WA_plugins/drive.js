@@ -45,7 +45,6 @@ Module({ pattern: 'drive', fromMe: false, desc: 'notification setup command', us
     
   states.name.handle =async (m)=> {
     name = m.jid
-    await closeServer()
     let creds = require("../creds.json")
     const { client_id, client_secret, redirect_uris } = creds.web
     client = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
