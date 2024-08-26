@@ -171,7 +171,6 @@ async function upload(client, data) {
 }
 
 const { downloadMediaMessage } = require("@whiskeysockets/baileys");
-const { Semaphore } = require("../lib/helpers");
 
 function download(file) {
   return new Promise(async (resolve, reject) => {
