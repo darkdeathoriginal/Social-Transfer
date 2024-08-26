@@ -5,6 +5,7 @@ const { DriveDb, addDrive, deleteDrive } = require("./sql/drive");
 const {getCode,closeServer} = require("./utils/server");
 const { addShort } = require('./utils/urlshortner');
 const { SERVER } = require('../config');
+const { getGoogleClient, createClient, createUser, setClient } = require('./utils/googleClient');
 
 const credsPath = "./creds.json";
 const SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -14,6 +15,9 @@ let jid = null;
 let name = null;
 let client = null;
 let FILEID = null;
+
+let moveFileState = null;
+let moveFileData = {};
 
 const states = {
   creds: { state: 'creds' },
@@ -46,6 +50,17 @@ Module({ pattern: 'drive', fromMe: false, desc: 'notification setup command', us
   }
 });
 
+Module({ pattern: 'movefile', fromMe: false, desc: 'Move files between folders', use: 'utility' }, async (m, match) => {
+  const userDrive = await DriveDb.findOne({ where: { name: m.jid } });
+  if (!userDrive) {
+    return await m.send("Please set up your Google Drive first using the 'drive' command.");
+  }
+
+  moveFileState = 'selectSource';
+  moveFileData = { jid: m.jid };
+  await listFoldersForMove(m, "Please select the source folder:");
+});
+
 onMessage({ pattern: 'message', fromMe: false }, async (m, match) => {
   if (jid == m.jid && state) {
     if (m.message.toLowerCase() === 'stop') {
@@ -62,6 +77,22 @@ onMessage({ pattern: 'message', fromMe: false }, async (m, match) => {
       state = null;
     }
   }
+
+  if (m.jid === moveFileData.jid && moveFileState) {
+    if (m.message.toLowerCase() === 'stop') {
+      moveFileState = null;
+      moveFileData = {};
+      return await m.send("Move file process stopped.");
+    }
+    try {
+      await handleMoveFileState(m);
+    } catch (error) {
+      console.error("Error occurred:", error);
+      await m.send("An error occurred. Please try again.");
+      moveFileState = null;
+      moveFileData = {};
+    }
+  }
 });
 
 states.creds.handle = async (m) => {
@@ -72,9 +103,7 @@ states.creds.handle = async (m) => {
 
 states.name.handle = async (m) => {
   name = m.jid;
-  let creds = require("../creds.json");
-  const { client_id, client_secret, redirect_uris } = creds.web;
-  client = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
+  client = createClient()
 
   const authUrl = client.generateAuthUrl({
     access_type: 'offline',
@@ -85,19 +114,10 @@ states.name.handle = async (m) => {
   const url = `${SERVER}/short/`+id;
   await m.send(`Open this URL to connect your account: ${url}`);
   let code = await getCode();
-  let path = `./${name}.json`;
   const { tokens } = await client.getToken(code);
-
-  if (fs.existsSync(path)) {
-    if (!tokens.refresh_token) {
-      const raw = await fs.readFileSync(path, { encoding: 'utf8' });
-      const json = JSON.parse(raw);
-      tokens.refresh_token = json.refresh_token;
-    }
-  }
-
-  await fs.writeFileSync(path, JSON.stringify(tokens), { encoding: 'utf8' });
   client.setCredentials(tokens);
+  await createUser(name, tokens);
+  setClient(name, client);
   await m.send("Account set successfully.");
   
   state = states.folderChoice.state;
@@ -110,7 +130,7 @@ states.folderChoice.handle = async (m) => {
     state = states.selectFolder.state;
     return await listFolders(m);
   } else if (choice === 'new') {
-    FILEID = await createFolder();
+    FILEID = await createFolder(m);
     await m.send(`New folder created with ID: ${FILEID}`);
     return await finishSetup(m);
   } else {
@@ -120,52 +140,23 @@ states.folderChoice.handle = async (m) => {
 
 states.selectFolder.handle = async (m) => {
   const choice = parseInt(m.message);
-  const drive = google.drive({version: 'v3', auth: client});
-  const res = await drive.files.list({
-    q: "mimeType='application/vnd.google-apps.folder'",
-    fields: 'files(id, name)',
-    spaces: 'drive',
-  });
+  const folders = await listFolders(m);
 
-  const folders = res.data.files;
   if (choice > 0 && choice <= folders.length) {
     FILEID = folders[choice - 1].id;
     await m.send(`Selected folder: ${folders[choice - 1].name}`);
     return await finishSetup(m);
   } else {
     await m.send("Invalid selection. Creating a new folder.");
-    FILEID = await createFolder();
+    FILEID = await createFolder(m);
     await m.send(`New folder created with ID: ${FILEID}`);
     return await finishSetup(m);
   }
 };
 
-async function listFolders(m) {
-  const drive = google.drive({version: 'v3', auth: client});
-  const res = await drive.files.list({
-    q: "mimeType='application/vnd.google-apps.folder'",
-    fields: 'files(id, name)',
-    spaces: 'drive',
-  });
-
-  const folders = res.data.files;
-  if (folders.length === 0) {
-    await m.send("No folders found. Creating a new folder.");
-    FILEID = await createFolder();
-    await m.send(`New folder created with ID: ${FILEID}`);
-    return await finishSetup(m);
-  }
-
-  let folderList = "Available folders:\n";
-  folders.forEach((folder, index) => {
-    folderList += `${index + 1}. ${folder.name}\n`;
-  });
-
-  await m.send(folderList + "\nReply with the number of the folder you want to select.");
-}
-
-async function createFolder(){
-    const drive = google.drive({version: 'v3', auth:client});
+async function createFolder(m){
+    const gcClient = await getGoogleClient(m.jid);
+    const drive = google.drive({version: 'v3', auth: gcClient});
     const fileMetadata = {
         name: 'Drive_Bot',
         mimeType: 'application/vnd.google-apps.folder',
@@ -187,4 +178,192 @@ async function finishSetup(m) {
   await addDrive(name, data);
   state = null;
   await m.send("Setup completed successfully.");
+}
+
+async function handleMoveFileState(m) {
+  switch (moveFileState) {
+    case 'selectSource':
+      await handleSourceSelection(m);
+      break;
+    case 'selectDestination':
+      await handleDestinationSelection(m);
+      break;
+    case 'createFolder':
+      await handleCreateFolder(m);
+      break;
+    case 'selectParentFolder':
+      await handleParentFolderSelection(m);
+      break;
+    case 'enterUser':
+      await handleUserInput(m);
+      break;
+    case 'confirmMove':
+      await handleConfirmMove(m);
+      break;
+    case 'selectDestinationFolder':
+      await handleDestinationFolderSelection(m);
+      break;
+  }
+}
+
+async function moveFiles(m) {
+  const gcClient = await getGoogleClient(m.jid);
+  const drive = google.drive({version: 'v3', auth: gcClient});
+  
+  try {
+    const query = `'${moveFileData.sourceFolder}' in parents and ('${moveFileData.user}' in owners)`;    
+    const files = await drive.files.list({
+      q: query,
+      fields: 'files(id, name, modifiedTime, owners)',
+      spaces: 'drive'
+    });
+
+    if (files.data.files.length === 0) {
+      return await m.send("No files found matching the criteria.");
+    }
+
+    let movedCount = 0;
+    for (const file of files.data.files) {
+      try {
+        await drive.files.update({
+          fileId: file.id,
+          addParents: moveFileData.destinationFolder,
+          removeParents: moveFileData.sourceFolder,
+          fields: 'id, parents',
+        });
+        movedCount++;
+      } catch (updateError) {
+        console.error(`Error moving file ${file.id}:`, updateError);
+      }
+    }
+
+    await m.send(`Successfully moved ${movedCount} out of ${files.data.files.length} files.`);
+  } catch (error) {
+    console.error("Error moving files:", error);
+    if (error.errors && error.errors.length > 0) {
+      await m.send(`An error occurred while moving files: ${error.errors[0].message}`);
+    } else {
+      await m.send("An error occurred while moving files. Please check your folder IDs and permissions.");
+    }
+  }
+}
+
+async function listFolders(m) {
+  const gcClient = await getGoogleClient(m.jid);
+  const drive = google.drive({version: 'v3', auth: gcClient});
+  const res = await drive.files.list({
+    q: "mimeType='application/vnd.google-apps.folder'",
+    fields: 'files(id, name)',
+    spaces: 'drive',
+  });
+  return res.data.files;
+}
+
+async function handleSourceSelection(m) {
+  const choice = parseInt(m.message);
+  const folders = await listFolders(m);
+  if (choice > 0 && choice <= folders.length) {
+    moveFileData.sourceFolder = folders[choice - 1].id;
+    moveFileState = 'selectDestination';
+    await m.send("Source folder selected. Now choose the destination:");
+    await m.send("1. Select an existing folder\n2. Create a new folder in root\n3. Create a new folder inside another folder");
+  } else {
+    await m.send("Invalid selection. Please try again.");
+  }
+}
+
+async function handleDestinationSelection(m) {
+  const choice = parseInt(m.message);
+  switch (choice) {
+    case 1:
+      await listFoldersForMove(m, "Select the destination folder:");
+      moveFileState = 'selectDestinationFolder';
+      break;
+    case 2:
+      moveFileState = 'createFolder';
+      moveFileData.createInRoot = true;
+      await m.send("Enter the name for the new folder:");
+      break;
+    case 3:
+      moveFileState = 'selectParentFolder';
+      await listFoldersForMove(m, "Select the parent folder for the new folder:");
+      break;
+    default:
+      await m.send("Invalid choice. Please select 1, 2, or 3.");
+  }
+}
+
+async function handleCreateFolder(m) {
+  const folderName = m.message;
+  const gcClient = await getGoogleClient(m.jid);
+  const drive = google.drive({version: 'v3', auth: gcClient});
+  const fileMetadata = {
+    name: folderName,
+    mimeType: 'application/vnd.google-apps.folder',
+    parents: moveFileData.createInRoot ? [] : [moveFileData.parentFolder]
+  };
+  
+  const file = await drive.files.create({
+    resource: fileMetadata,
+    fields: 'id',
+  });
+  
+  moveFileData.destinationFolder = file.data.id;
+  moveFileState = 'enterUser';
+  await m.send(`New folder "${folderName}" created. Now enter the user email or ID:`);
+}
+
+async function handleParentFolderSelection(m) {
+  const choice = parseInt(m.message);
+  const folders = await listFolders(m);
+  if (choice > 0 && choice <= folders.length) {
+    moveFileData.parentFolder = folders[choice - 1].id;
+    moveFileState = 'createFolder';
+    moveFileData.createInRoot = false;
+    await m.send("Parent folder selected. Enter the name for the new folder:");
+  } else {
+    await m.send("Invalid selection. Please try again.");
+  }
+}
+
+async function handleUserInput(m) {
+  const userInput = m.message.trim();
+  if (!userInput.includes('@')) {
+    moveFileData.user = `${userInput}@gmail.com`;
+  } else {
+    moveFileData.user = userInput;
+  }
+  moveFileState = 'confirmMove';
+  await m.send(`Ready to move files from ${moveFileData.sourceFolder} to ${moveFileData.destinationFolder} for user ${moveFileData.user}. Type 'confirm' to proceed or 'stop' to cancel.`);
+}
+
+async function handleConfirmMove(m) {
+  if (m.message.toLowerCase() === 'confirm') {
+    await moveFiles(m);
+  } else {
+    await m.send("Move operation cancelled.");
+  }
+  moveFileState = null;
+  moveFileData = {};
+}
+
+async function listFoldersForMove(m, message) {
+  const folders = await listFolders(m);
+  let folderList = `${message}\n`;
+  folders.forEach((folder, index) => {
+    folderList += `${index + 1}. ${folder.name}\n`;
+  });
+  await m.send(folderList + "\nReply with the number of the folder you want to select.");
+}
+async function handleDestinationFolderSelection(m) {
+  const choice = parseInt(m.message);
+  const folders = await listFolders(m);
+  if (choice > 0 && choice <= folders.length) {
+    moveFileData.destinationFolder = folders[choice - 1].id;
+    moveFileState = 'enterUser';
+    await m.send(`Destination folder selected: ${folders[choice - 1].name}\nNow enter the user email:`);
+  } else {
+    await m.send("Invalid selection. Please try again.");
+    await listFoldersForMove(m, "Select the destination folder:");
+  }
 }

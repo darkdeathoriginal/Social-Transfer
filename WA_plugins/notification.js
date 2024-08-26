@@ -3,10 +3,9 @@ require("dotenv").config();
 const { google } = require("googleapis");
 const { ClassDb, updateClass, UserDb } = require("./sql/classroom");
 const { fromBuffer } = require("file-type");
+const { getGoogleClient, gcClients } = require("./utils/googleClient");
 
-const credsPath = "../creds.json";
 const RUN = process.env.NOTIFICATION === 'on';
-const gcClients = {};
 const MAX_RETRIES = 10;
 const RETRY_DELAY = 60000; // 1 minute in milliseconds
 const ADMIN_PHONE = "919072215994@s.whatsapp.net";
@@ -15,7 +14,7 @@ async function main(obj) {
   let tries = 0;
   while (tries < MAX_RETRIES) {
     try {
-      const gcClient = await getOrCreateGcClient(obj.name);
+      const gcClient = await getGoogleClient(obj.name);
       await processCourses(obj, gcClient);
       await new Promise(resolve => setTimeout(resolve, 60000));
     } catch (error) {
@@ -27,36 +26,6 @@ async function main(obj) {
   }
 }
 
-async function getOrCreateGcClient(name) {
-  if (gcClients[name]) return gcClients[name];
-
-  const creds = require(credsPath);
-  const { client_id, client_secret, redirect_uris } = creds.web;
-  const gcClient = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-  await authorize(gcClient, name);
-  gcClients[name] = gcClient;
-  return gcClient;
-}
-
-async function authorize(gcClient, name) {
-  const authToken = await getAuthToken(name);
-  gcClient.setCredentials(authToken);
-  const { token } = await gcClient.getAccessToken();
-  await verifyAndUpdateToken(name, token);
-}
-
-async function getAuthToken(name) {
-  const token = await UserDb.findOne({ where: { name } });
-  return token;
-}
-
-async function verifyAndUpdateToken(name, token) {
-  const json = await UserDb.findOne({ where: { name } });
-  if (token !== json.access_token) {
-    json.access_token = token;
-    await json.save();
-  }
-}
 
 async function processCourses(obj, gcClient) {
   const { cources, forward, state } = obj.data;
@@ -299,7 +268,6 @@ module.exports = {
   listAnnouncements,
   listCourseWorkMaterials,
   listCourseWork,
-  gcClients,
   getCourses,
   main,
 };

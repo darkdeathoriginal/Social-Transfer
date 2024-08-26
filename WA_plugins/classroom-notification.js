@@ -13,7 +13,6 @@ const {
   listAnnouncements,
   listCourseWorkMaterials,
   listCourseWork,
-  gcClients,
   getCourses,
   main,
 } = require("./notification");
@@ -21,6 +20,7 @@ const { fromBuffer } = require("file-type");
 const { getCode } = require("./utils/server");
 const { addShort } = require("./utils/urlshortner");
 const { SERVER } = require("../config");
+const { createClient, createUser, gcClients } = require("./utils/googleClient");
 
 const credsPath = "./creds.json";
 const SCOPES = [
@@ -153,9 +153,7 @@ states.menu.handle = async (m) => {
 
 states.name.handle = async (m) => {
   name = m.message;
-  let creds = require("../creds.json");
-  const { client_id, client_secret, redirect_uris } = creds.web;
-  client = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
+  client = createClient()
 
   const authUrl = client.generateAuthUrl({
     access_type: "offline",
@@ -166,19 +164,8 @@ states.name.handle = async (m) => {
   const url = `${SERVER}/short/` + id;
   await m.send(`Open this URL to connect your account: ${url}`);
   let code = await getCode();
-  let path = `./${name}.json`;
   const { tokens } = await client.getToken(code);
-  await UserDb.sync();
-  const user = await UserDb.findOne({ where: { name: name } });
-  if (user) {
-    if (!tokens.refresh_token) {
-      tokens.refresh_token = user.refresh_token;
-    }
-    user.update(tokens);
-  } else {
-    tokens.name = name;
-    await UserDb.create(tokens);
-  }
+  await createUser(name, tokens);
   client.setCredentials(tokens);
   state = states.options.state;
   await m.send("Successfully set notification");
@@ -235,7 +222,6 @@ states.newjid.handle = async (m) => {
   state = false;
 
   await m.send(a ? "Succesfully changed jid" : "error");
-  process.exit(0);
 };
 states.delete.handle = async (m) => {
   var no = /\d+/.test(m.message) ? m.message.match(/\d+/)[0] : false;
@@ -246,7 +232,6 @@ states.delete.handle = async (m) => {
     state = false;
     await UserDb.destroy({ where: { name: name } });
     await m.send("succesfully removed");
-    process.exit(0);
   } else {
     setStateTimeout()
     await m.send("Invalid option");
