@@ -4,7 +4,7 @@ const fs = require("fs");
 const codeRouter = require("./Routes/code");
 const githubRouter = require("./Routes/github")
 const shortnerRouter = require("./Routes/shortner")
-const jiraRouter = require("./Routes/jira)
+const jiraRouter = require("./Routes/jira")
 const {PORT:port} = require("../config")
 
 const app = express();
