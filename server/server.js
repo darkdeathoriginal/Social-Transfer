@@ -4,6 +4,7 @@ const fs = require("fs");
 const codeRouter = require("./Routes/code");
 const githubRouter = require("./Routes/github")
 const shortnerRouter = require("./Routes/shortner")
+const jiraRouter = require("./Routes/jira)
 const {PORT:port} = require("../config")
 
 const app = express();
@@ -40,6 +41,7 @@ if (
 app.use("/", codeRouter);
 app.use("/github",githubRouter)
 app.use("/short",shortnerRouter)
+app.use("/jira",jiraRouter)
 
 if (server) {
   server.listen(port, () => {
