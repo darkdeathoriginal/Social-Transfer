@@ -5,6 +5,7 @@ const router = express.Router();
 router.post("/", async (req, res) => {
     const body = req.body;
     const jid = req.query.jid || "919072215994@s.whatsapp.net"; 
+    const branch = req.query.branch
 
     if (!body || Object.keys(body).length === 0) { 
         return res.status(400).send("No body content received.");
@@ -32,7 +33,9 @@ router.post("/", async (req, res) => {
                 refType = "Ref";
             }
         }
-
+        if(branch && refType == "Branch" && refName != branch){
+            return
+        }
         let message = `🚀 *Push to ${repoName}* by *${pusherName}*\n`;
         if (repoUrl) {
             message += `📦 Repository: ${repoUrl}\n`;
