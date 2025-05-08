@@ -93,6 +93,24 @@ router.post("/", async (req, res) => {
             }
             if (issueLink) whatsappMessage += `🔗 Link: ${issueLink}`;
         }
+        else if (eventType === "jira:issue_updated") {
+            actorName = jiraPayload.user?.displayName || "Unknown User";
+            whatsappMessage = `⚙️ *Issue Updated* by ${actorName}\n\n`;
+            whatsappMessage += `🔑 *${issueKey}*: ${issueSummary}\n`;
+            const changelog = jiraPayload.changelog;
+            if (changelog && changelog.items && changelog.items.length > 0) {
+                whatsappMessage += `\n*Changes:*\n`;
+                changelog.items.forEach(item => {
+                    const fieldName = item.field.charAt(0).toUpperCase() + item.field.slice(1);
+                    const from = item.fromString || "_empty_";
+                    const to = item.toString || "_empty_";
+                    whatsappMessage += `  • *${fieldName}*: _${from}_ → *${to}*\n`;
+                });
+            } else {
+                whatsappMessage += `ℹ️ _(General update or no specific field changes detailed)_ \n`;
+            }
+            if (issueLink) whatsappMessage += `\n🔗 Link: ${issueLink}`;
+        }
         // --- Comment Events (as per your selection) ---
         else if (eventType === "jira:comment_created" || eventType === "comment_created") {
             const comment = jiraPayload.comment;
