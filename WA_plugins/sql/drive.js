@@ -2,7 +2,7 @@ const config = require('../../config');
 const { DataTypes } = require('sequelize');
 
 const DriveDb = config.DATABASE.define('Drive', {
-    name: {
+    jid: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -14,18 +14,18 @@ const DriveDb = config.DATABASE.define('Drive', {
 
 async function addDrive(name, data) {
     var Plugin = await DriveDb.findAll({
-        where: {name: name}
+        where: {jid: name}
     });
 
     if (Plugin.length >= 1) {
         return false;
     } else {
-        return await DriveDb.create({ data: data, name: name });
+        return await DriveDb.create({ data: data, jid: name });
     }
 }
 async function updateDrive(name, data) {
     const plugin = await DriveDb.findOne({
-        where: { name: name }
+        where: { jid: name }
     });
 
     if (!plugin) {
@@ -38,7 +38,7 @@ async function updateDrive(name, data) {
 }
 async function deleteDrive(name) {
     const deletedRows = await DriveDb.destroy({
-      where: { name: name },
+      where: { jid: name },
     });
   
     return deletedRows > 0;

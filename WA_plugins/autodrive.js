@@ -12,7 +12,7 @@ async function mn() {
   await DriveDb.sync();
   let data = await DriveDb.findAll();
   for (let i of data) {
-    await getGoogleClient(i.name);
+    await getGoogleClient(i.jid);
   }
 }
 mn();
@@ -22,7 +22,7 @@ onMessage(
   async (m) => {
     if (gcClients[m.jid]) {
       try {
-        let ob = (await DriveDb.findAll()).find((c) => c.name === m.jid);
+        let ob = (await DriveDb.findAll()).find((c) => c.jid === m.jid);
         const messageType = Object.keys(m.data.message)[0];
         let fileDetails;
 
@@ -61,7 +61,7 @@ onMessage(
             return;
         }
         await semaphore.acquire();
-        if (fileDetails) {
+        if (fileDetails) {          
           const stream = await download(m.data);
           await upload(gcClients[m.jid], {
             ...fileDetails,
