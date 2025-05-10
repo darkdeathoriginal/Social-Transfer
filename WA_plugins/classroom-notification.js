@@ -117,7 +117,7 @@ onMessage(
     const adminJid = m.jid;
     const context = userClassroomContexts.get(adminJid);
 
-    if (context && m.message && m.message.toLowerCase() !== ".test") {
+    if (context && m.message && m.message.toLowerCase() !== ".classroom") {
       setContextTimeout(adminJid);
 
       if (m.message.toLowerCase() === "stop") {
