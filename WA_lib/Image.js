@@ -48,7 +48,7 @@ class Image extends Base {
 
     if (
       data.message.imageMessage.hasOwnProperty("contextInfo") &&
-      data.message.contextInfo.quotedMessage
+      data.message?.contextInfo?.quotedMessage
     ) {
       this.reply_message = new ReplyMessage(
         this.client,
