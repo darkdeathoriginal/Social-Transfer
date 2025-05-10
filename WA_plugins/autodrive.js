@@ -124,12 +124,6 @@ onMessage(
         stream: mediaStream,
         targetFolderId: targetFolderId,
       });
-
-      await m.client.sendMessage(
-        m.jid,
-        { text: `✅ File "${fileDetails.name}" uploaded to Google Drive.` },
-        { quoted: m.data }
-      );
     } catch (e) {
       console.error(`[AutoDrive] Error during upload process for ${m.jid}:`, e);
       let userErrorMessage = "An error occurred while uploading your file. ";
